@@ -1,0 +1,346 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> 
+
+<html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>D3 in Action</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+		<link rel="icon"  type="image/png" href="../favicon.png" />        
+		<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+        <link href="../dist/css/normalize.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/skeleton.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/prism.css" rel="stylesheet" type="text/css">
+
+        <link rel="stylesheet" href="../dist/css/app.css" rel="stylesheet" type="text/css">
+        
+       
+
+        
+</head>
+
+
+
+	<style rel="stylesheet" type="text/css">
+
+
+		.xnode {
+  			font: 10px sans-serif;
+  			position: relative;
+		}
+
+		.node {
+		  cursor: pointer;
+		}
+
+		.node:hover {
+		  stroke: #000;
+		  stroke-width: 1.5px;
+		}
+
+		.node--leaf {
+		  fill: white;
+		}
+
+		.label {
+		  font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+		  text-anchor: middle;
+		  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
+		}
+
+		.label,
+		.node--root,
+		.node--leaf {
+		  pointer-events: none;
+		}
+
+	</style>
+
+<body>
+
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+		    
+		    <h1><a href="../index.html" media="all" accesskey="0" title="D3 in action">D3 in action</a></h1>
+		    <p>Elijah Meeks</p>
+		    <p>Manning 2015</p>
+	    </div>
+	  </div>
+	</div>
+
+
+
+<article>
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+			<h3 id="data">Bonus: 5.3.1 Pack Layout</h3>
+			<p><small>Pack Layout <span id="spanOptions"></span></small></p>
+			<div id="viz">
+			</div>
+
+			<p class="caption">NYC Expenditure plotted in using Pack Layout.</p>
+
+	    </div>
+	  </div>
+	</div>
+		
+		
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+
+			<pre><code class="language-markup"> <script type="prism-html-markup">
+<div id="viz">
+</div>
+</script>			    
+			</code></pre>
+
+
+	
+
+			<pre><code class="language-js">
+var nybudget = {
+   'name': 'NYC Budget 2015', 
+   'children': [
+        {'name': 'Personal Services', 'children': [
+            {'name': 'Salaries and Wages', 'value': 24023},
+            {'name': 'Pensions', 'value': 8621},
+            {'name': 'Fringe Benefits', 'value': 8635},
+            {'name': 'Retiree Health Benefits', 'value': 955},
+			] 
+		},
+        {'name': 'Other Services', 'children': [
+            {'name': 'Medical Assistance', 'value': 6275},
+            {'name': 'Public Assistance', 'value': 1472},
+            {'name': 'All Other ', 'value': 25149},
+			] 
+		},
+        {'name': 'Debt Service', 'value': 5971},
+      ]
+};
+
+// Dimensions
+var h = 400,
+	w = 400;
+var margin = 20;
+
+
+// Format numbers for human consumption.
+var format = d3.format(",d"); // decimal notation, rounded to integer.
+
+// COLORS
+// colores usados por Google en sus graficos, trends, etc.
+//
+function colores_google(n) {
+  var colores_g = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
+  return colores_g[n % colores_g.length];
+}
+//
+// CONVERT CSV TO HIERARCHY
+
+
+
+
+// DRAWING AREA
+var mySVG = d3.select("#viz")
+	.append('svg:svg')
+	.attr("width", w)
+	.attr("height", h)
+	.attr("preserveAspectRatio", "xMinYMin meet")
+	.attr("viewBox", "0 0 400 400")
+	.attr('class', 'xnode');;
+
+var diameter = +mySVG.attr("width");
+var g = mySVG.append('svg:g')
+	.attr('class', 'rootG')
+	.attr("transform", "translate(" + 1 + "," + 1 + ")");
+
+// PACK LAYOUT
+var pack = d3.pack()
+	.size([diameter - margin, diameter - margin])
+	.padding(2);
+
+var root = d3.hierarchy(nybudget)
+  .sum(function(d) { return d.value; })
+  .sort(function(a, b) { return b.value - a.value; });
+
+var nodes = pack(root).descendants();  
+
+
+var circle = g.selectAll("circle")
+	.data(nodes)
+	.enter()
+	.append("circle")
+	.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+	.attr("r", function(d) { return d.r; })
+  	.attr("class", function(d) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root"; })
+  	.style("fill", function(d) { 
+  		return d.children ? colores_google(d.depth) : null; 
+  	})
+  	.style("fill-opacity", function(d) { return 0.8; })
+  	.each(function(d) { d.node = this; }) 
+ 
+  
+var text = g.selectAll("text")
+	.data(nodes)
+	.enter()
+	.append("text")
+	.attr("class", "label")
+	.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+	.style("fill-opacity", function(d) { return d.parent === root ? 1 : 0; })
+	.style("display", function(d) { return d.parent === root ? "inline" : "none"; })
+	.text(function(d) { return d.data.name; });
+
+			</code></pre>
+
+
+
+
+	    </div>
+	  </div>
+
+
+
+
+
+	</div>
+	
+	
+</article>
+
+
+<script src="../dist/js/vendors/d3.min.js" type="text/javaScript"></script>
+<script src="../dist/js/d3-tip.js" type="text/javaScript"></script>
+
+<!-- http://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3 -->
+<!-- <script src="../dist/js/colorbrewer.js" type="text/javascript"></script>
+ -->
+<script>
+		
+
+(function(scope, d3) {
+
+	// http://bl.ocks.org/mbostock/6bbb0a7ff7686b124d80
+
+
+	// DATA
+	var nybudget = {
+	   'name': 'NYC Budget 2015'  , 
+	   'children': [
+	        {'name': 'Personal Services', 'children': [
+	            {'name': 'Salaries and Wages', 'value': 24023},
+	            {'name': 'Pensions', 'value': 8621},
+	            {'name': 'Fringe Benefits', 'value': 8635},
+	            {'name': 'Retiree Health Benefits', 'value': 955},
+				] 
+			},
+	        {'name': 'Other Services', 'children': [
+	            {'name': 'Medical Assistance', 'value': 6275},
+	            {'name': 'Public Assistance', 'value': 1472},
+	            {'name': 'All Other ', 'value': 25149},
+				] 
+			},
+	        {'name': 'Debt Service', 'value': 5971},
+	      ]
+	};
+
+	// Dimensions
+	var h = 400,
+		w = 400;
+	var margin = 20;
+
+	
+	// Format numbers for human consumption.
+	var format = d3.format(",d"); // decimal notation, rounded to integer.
+
+	// COLORS
+// colores usados por Google en sus graficos, trends, etc.
+//
+	function colores_google(n) {
+	  var colores_g = ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
+	  return colores_g[n % colores_g.length];
+	}
+//
+    // CONVERT CSV TO HIERARCHY
+
+
+
+
+    // DRAWING AREA
+	var mySVG = d3.select("#viz")
+		.append('svg:svg')
+		.attr("width", w)
+    	.attr("height", h)
+    	.attr("preserveAspectRatio", "xMinYMin meet")
+    	.attr("viewBox", "0 0 400 400")
+    	.attr('class', 'xnode');;
+
+    var diameter = +mySVG.attr("width");
+    // console.log(diameter);
+    var g = mySVG.append('svg:g')
+    	.attr('class', 'rootG')
+    	.attr("transform", "translate(" + 1 + "," + 1 + ")");
+
+    console.log(g);
+    // PACK LAYOUT
+    var pack = d3.pack()
+    	.size([diameter - margin, diameter - margin])
+    	.padding(2);
+    
+    var root = d3.hierarchy(nybudget)
+      .sum(function(d) { return d.value; })
+      .sort(function(a, b) { return b.value - a.value; });
+    
+    var nodes = pack(root).descendants();  
+
+
+    var circle = g.selectAll("circle")
+    	.data(nodes)
+    	.enter()
+    	.append("circle")
+    	.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+    	.attr("r", function(d) { return d.r; })
+      	.attr("class", function(d) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root"; })
+      	.style("fill", function(d) { 
+      		return d.children ? colores_google(d.depth) : null; 
+      	})
+      	.style("fill-opacity", function(d) { return 0.8; })
+      	.each(function(d) { d.node = this; }) 
+
+
+	var text = g.selectAll("text")
+    	.data(nodes)
+    	.enter()
+    	.append("text")
+		.attr("class", "label")
+		.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+		.style("fill-opacity", function(d) { return d.parent === root ? 1 : 0; })
+		.style("display", function(d) { return d.parent === root ? "inline" : "none"; })
+		.text(function(d) { return d.data.name; });
+
+	
+    		
+	
+
+})(window, d3);	
+
+	
+</script>
+<script src="../dist/js/prism.js" type="text/javaScript"></script>
+
+</body>
+
+</html>

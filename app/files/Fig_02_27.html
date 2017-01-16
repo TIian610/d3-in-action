@@ -1,0 +1,229 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> 
+
+<html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>D3 in Action</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+		<link rel="icon"  type="image/png" href="../favicon.png" />        
+		<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+        <link href="../dist/css/normalize.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/skeleton.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/prism.css" rel="stylesheet" type="text/css">
+
+        <link rel="stylesheet" href="../dist/css/app.css" rel="stylesheet" type="text/css">
+        
+        
+
+        
+</head>
+
+
+
+	<style rel="stylesheet" type="text/css">
+
+		svg {
+
+			width: 600px;
+			height: 500px;
+			border: 1px lightgray solid;
+			background-color: #ffffff;
+		}
+
+	</style>
+
+<body>
+
+
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+		    
+		    <h1><a href="../index.html" media="all" accesskey="0" title="D3 in action">D3 in action</a></h1>
+		    <p>Elijah Meeks</p>
+		    <p>Manning 2015</p>
+	    </div>
+	  </div>
+	</div>
+
+
+
+<article>
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+			<h3 id="figure2.27">2.3.3 Enter, update and exit | Listing 2.7 Setting the key value in data-binding
+</h3>
+			
+			<svg id='svg' viewBox="0 0 600 480" preserveAspectRatio="none"></svg>
+
+		    </div>
+			<p class="caption">Figure 2.27 All elements corresponding to tweets that were not favorited and not retweeted were removed.</p>
+
+	    </div>
+	  </div>
+	</div>
+		
+		
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+
+			    <pre><code class="language-markup"> <script type="prism-html-markup">
+<svg id='svg' viewBox="0 0 600 480" preserveAspectRatio="none"></svg>
+</script>			    
+				</code></pre>
+	
+	
+
+
+
+
+
+		
+			 <pre><code class="language-js">
+// Figure 2.27
+d3.json("../data/tweets.json",function(error,data) {dataVizScatterplot(data.tweets)});
+
+function dataVizScatterplot(incomingData) {
+	
+	incomingData.forEach(function (el) {
+
+		el.impact = el.favorites.length + el.retweets.length;
+		el.tweetTime = new Date(el.timestamp);
+
+	})
+
+	var maxImpact = d3.max(incomingData, function(el) { return el.impact; });
+	var startEnd = d3.extent(incomingData, function(el) {
+
+		return el.tweetTime;
+
+	});
+	var timeRamp = d3.scaleTime().domain(startEnd).range([50,450]);
+	var yScale = d3.scaleLinear().domain([0,maxImpact]).range([0,460]);	
+	var radiusScale = d3.scaleLinear().domain([0,maxImpact]).range([1,20]);
+   var colorScale = d3.scaleLinear().domain([0,maxImpact]).range(["white","#990000"]);
+   var filteredData = incomingData.filter(
+       function(el) {return el.impact > 0}
+   );
+
+
+	d3.select("svg")
+		.selectAll("circle")
+		.data(incomingData, function(d) { return JSON.stringify(d)} )
+		.enter()
+		.append("circle")
+		.attr("r", function(d) { return radiusScale(d.impact) })
+		.attr("cx", function(d,i) { return timeRamp(d.tweetTime) })
+		.attr("cy", function(d) { return 480 - yScale(d.impact)} )
+		.style("fill", "#990000")
+		.style("stroke", "black")
+		.style("stroke-width", "1px");
+
+	var filteredData = incomingData.filter(
+		function(el) { return el.impact > 0 }
+	);
+
+	d3.selectAll("circle")
+		.data(filteredData, function(d) {return JSON.stringify(d)})
+		.exit()
+		.remove();
+
+}
+	
+			</code></pre>
+
+	    </div>
+	  </div>
+	</div>
+	
+	
+</article>
+
+
+<script src="../dist/js/vendors/d3.min.js" type="text/JavaScript"></script>
+
+<script>
+	
+
+(function(scope, d3) {
+
+
+
+	 // Figure 2.27
+	 d3.json("../data/tweets.json",function(error,data) {dataVizScatterplot(data.tweets)});
+
+	function dataVizScatterplot(incomingData) {
+		
+		incomingData.forEach(function (el) {
+
+  			el.impact = el.favorites.length + el.retweets.length;
+  			el.tweetTime = new Date(el.timestamp);
+
+		})
+	
+		var maxImpact = d3.max(incomingData, function(el) { return el.impact; });
+		var startEnd = d3.extent(incomingData, function(el) {
+
+   			return el.tweetTime;
+
+		});
+		var timeRamp = d3.scaleTime().domain(startEnd).range([50,450]);
+		var yScale = d3.scaleLinear().domain([0,maxImpact]).range([0,460]);	
+		var radiusScale = d3.scaleLinear().domain([0,maxImpact]).range([1,20]);
+        var colorScale = d3.scaleLinear().domain([0,maxImpact]).range(["white","#990000"]);
+        var filteredData = incomingData.filter(
+            function(el) {return el.impact > 0}
+        );
+
+
+		d3.select("svg")
+			.selectAll("circle")
+			.data(incomingData, function(d) { return JSON.stringify(d)} )
+			.enter()
+			.append("circle")
+			.attr("r", function(d) { return radiusScale(d.impact) })
+			.attr("cx", function(d,i) { return timeRamp(d.tweetTime) })
+			.attr("cy", function(d) { return 480 - yScale(d.impact)} )
+			.style("fill", function(d) {return colorScale(d.impact)})
+			.style("stroke", "black")
+			.style("stroke-width", "1px");
+
+		var filteredData = incomingData.filter(
+			function(el) { return el.impact > 0 }
+		);
+
+		d3.selectAll("circle")
+			.data(filteredData, function(d) {return JSON.stringify(d)})
+			.exit()
+			.remove();
+
+
+	}	
+
+
+
+
+})(window, d3);	
+
+	
+</script>
+
+<script src="../dist/js/prism.js" type="text/JavaScript"></script>
+
+</body>
+
+</html>

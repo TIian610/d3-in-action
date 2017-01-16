@@ -1,0 +1,420 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> 
+
+<html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>D3 in Action</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+		<link rel="icon"  type="image/png" href="../favicon.png" />        
+		<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+        <link href="../dist/css/normalize.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/skeleton.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/prism.css" rel="stylesheet" type="text/css">
+
+        <link rel="stylesheet" href="../dist/css/app.css" rel="stylesheet" type="text/css">
+        
+        
+
+        
+</head>
+
+
+
+	<style rel="stylesheet" type="text/css">
+
+		svg{
+			width: 500px;
+			height: 500px;
+			border: 1px lightgray solid;
+		}
+		text {
+	        font-size: 10px;
+	        transition: all 500ms;
+        }
+        g > text.active {
+	        font-size: 30px;
+        }
+        circle {
+			fill: pink;
+			stroke: black;
+			stroke-width: 1px;
+		}
+		circle.active {
+			fill: red;
+		}
+		circle.inactive {
+			fill: gray;
+		}
+		button{
+			margin-right: 1.7em;
+		}
+		g.overallG {
+	  		pointer-events: all;
+		}
+		.highlight {
+  			font-size: 24px;
+
+		}
+
+	</style>
+
+<body>
+
+
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+		    
+		    <h1><a href="../index.html" media="all" accesskey="0" title="D3 in action">D3 in action</a></h1>
+		    <p>Elijah Meeks</p>
+		    <p>Manning 2015</p>
+	    </div>
+	  </div>
+	</div>
+
+
+
+<article>
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+			<h3>3.2.3 DOM Manipulations</h3>
+			
+			<div id="viz">
+			  <svg id='svg' viewBox="0 0 500 500" preserveAspectRatio="none">
+			  </svg>
+			</div>
+			<div id="controls">
+			</div>
+
+		    
+			<p class="caption">Figure 3.9 The &lt;text&gt; element “Germany” is drawn at the same DOM level as the parent &lt;g&gt;, which, in this case, is behind the element to its right.</p>
+			<p class="caption">Figure 3.10 Re-appending the &lt;g&gt; element for Germany to the &lt;svg&gt; element moves it to the end of that DOM region and therefore it’s drawn above the other &lt;g&gt;elements.</p>
+
+	    </div>
+	  </div>
+	</div>
+		
+		
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+
+			    <pre><code class="language-markup"> <script type="prism-html-markup">
+<div id="viz">
+  <svg id='svg' viewBox="0 0 500 500" preserveAspectRatio="none">
+  </svg>
+</div>
+<div id="controls">
+</div>
+</script>			    
+				</code></pre>
+	
+	
+
+			 <pre><code class="language-js">
+[{"team":"Netherlands","region":"UEFA","win":"6","loss":"0","draw":"1","points":"18","gf":"12","ga":"6","cs":"2","yc":"23","rc":"1"},
+{"team":"Spain","region":"UEFA","win":"6","loss":"0","draw":"1","points":"18","gf":"8","ga":"2","cs":"5","yc":"8","rc":"0"},
+{"team":"Germany","region":"UEFA","win":"5","loss":"0","draw":"2","points":"15","gf":"16","ga":"5","cs":"3","yc":"10","rc":"1"},
+{"team":"Argentina","region":"CONMEBOL","win":"4","loss":"0","draw":"1","points":"12","gf":"10","ga":"6","cs":"2","yc":"8","rc":"0"},
+{"team":"Uruguay","region":"CONMEBOL","win":"3","loss":"2","draw":"2","points":"11","gf":"11","ga":"8","cs":"3","yc":"13","rc":"2"},
+{"team":"Brazil","region":"CONMEBOL","win":"3","loss":"1","draw":"1","points":"10","gf":"9","ga":"4","cs":"2","yc":"9","rc":"2"},
+{"team":"Ghana","region":"CAF","win":"2","loss":"2","draw":"1","points":"8","gf":"5","ga":"4","cs":"1","yc":"12","rc":"0"},
+{"team":"Japan","region":"AFC","win":"2","loss":"1","draw":"1","points":"7","gf":"4","ga":"2","cs":"2","yc":"4","rc":"0"}]
+			</code></pre>
+
+
+
+		
+			 <pre><code class="language-js">
+	function overallTeamViz(incomingData) {
+		// console.log(`${JSON.stringify(incomingData)}`);
+		d3.select("svg")
+		.append("g")
+		.attr("id", "teamsG")
+		.attr("transform", "translate(50,300)")
+		.selectAll("g")
+		.data(incomingData)
+		.enter()
+		.append("g")
+		.attr("class", "overallG")
+		.attr("transform", function (d,i) {return "translate(" + (i * 50) + ", 0)"});
+		  
+		var teamG = d3.selectAll("g.overallG");
+
+		teamG
+		.append("circle")
+		.attr("r", 0)
+		.transition()
+		.delay(function(d,i) {return i * 100})
+		.duration(500)
+		.attr("r", 40)
+		.transition()
+		.duration(500)
+		.attr("r", 20);
+
+		teamG
+		.append("text")
+		.style("text-anchor", "middle")
+		.attr("y", 30)
+		//.style("font-size", "10px")
+		.text(function(d) {return d.team});
+
+		var dataKeys = d3.keys(incomingData[0])
+		.filter(function (el) { return el != "team" && el != "region" });
+
+		// console.log(dataKeys);
+
+		d3.select("#controls")
+		.selectAll("button.teams")
+		.data(dataKeys)
+		.enter()
+		.append("button")
+		.attr("class", "btn-sm")
+		
+		// Registers an onclick behavior for each button, with a wrapper that gives access to the data that was bound to it when it was created
+		.on("click", buttonClick)
+		.html(function(d) {return d});
+
+// The function each button is calling on click, with the bound data sent automatically as the first argument
+		function buttonClick(datapoint) {
+			var maxValue = d3.max(incomingData,function(d) {
+				return parseFloat(d[datapoint])
+			});
+
+			var radiusScale = d3.scaleLinear().domain([0,maxValue]).range([2,20]);
+ 				
+
+			d3.selectAll("g.overallG")
+			.select("circle")
+			.transition()
+			.duration(1000)
+			.attr("r", function(d) {return radiusScale(d[datapoint])});
+	
+		}
+
+		function highlightRegion(d,i) {
+
+			console.log(this);
+ 			d3.select(this)
+ 			.select("text")
+			//.transition()
+			//.duration(500)
+			.attr("y", 60)
+			// This time we used d as our variable, which is typical in the examples you’ll see online for D3 functionality.
+			//A s a result, we changed the inline function variable to p, so that it wouldn’t conflict.
+ 			.classed('highlight',true);
+
+ 			d3.selectAll('g.overallG')
+ 			.each(function(p,i){
+ 				p.region === d.region ?
+ 					d3.select(this).select('circle').classed('active', true) :
+ 					d3.select(this).select('circle').classed('inactive', true);
+ 			})
+ 			this.parentElement.appendChild(this);
+		}
+
+		function unHighlight() {
+  			d3.selectAll("g.overallG")
+  			.select("circle")
+			//.transition()
+			//.duration(500)
+  			.classed("active",false)
+  			.classed("inactive",false);
+  			
+  			d3.selectAll("g.overallG")
+  			.select("text")
+			//.transition()
+			//.duration(500)
+  			.attr("y", 30)
+  			.classed("highlight", false);
+  		}
+
+  		// One thing we can do to easily disable mouse events on elements is to set the style property "pointer-events" of those ele- ments to "none".
+  		teamG.select("text").style("pointer-events","none");
+		teamG.on("mouseover",highlightRegion);
+		teamG.on("mouseout", unHighlight);
+
+		d3.selectAll("circle").each(function(d,i) {
+    		console.log(d); // Object {team: "Netherlands", region: "UEFA", win: "6", loss: "0", draw: "1"…}
+    		console.log(i); // 0
+    		console.log(this); // <circle r="20"></circle>
+		});
+
+	}
+
+
+
+	d3.csv("/data/worldcup.csv", function(data) {
+    	overallTeamViz(data);
+  	});
+
+			</code></pre>
+
+	    </div>
+	  </div>
+	</div>
+	
+	
+</article>
+
+
+<script src="../dist/js/vendors/d3.min.js" type="text/JavaScript"></script>
+
+<!-- http://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3 -->
+<script src="../dist/js/colorbrewer.js" type="text/javascript"></script>
+
+<script>
+	
+
+(function(scope, d3) {
+
+
+	function overallTeamViz(incomingData) {
+		// console.log(`${JSON.stringify(incomingData)}`);
+		d3.select("svg")
+		.append("g")
+		.attr("id", "teamsG")
+		.attr("transform", "translate(50,300)")
+		.selectAll("g")
+		.data(incomingData)
+		.enter()
+		.append("g")
+		.attr("class", "overallG")
+		.attr("transform", function (d,i) {return "translate(" + (i * 50) + ", 0)"});
+		  
+		var teamG = d3.selectAll("g.overallG");
+
+		teamG
+		.append("circle")
+		.attr("r", 0)
+		.transition()
+		.delay(function(d,i) {return i * 100})
+		.duration(500)
+		.attr("r", 40)
+		.transition()
+		.duration(500)
+		.attr("r", 20);
+
+		teamG
+		.append("text")
+		.style("text-anchor", "middle")
+		.attr("y", 30)
+		//.style("font-size", "10px")
+		.text(function(d) {return d.team});
+
+		var dataKeys = d3.keys(incomingData[0])
+		.filter(function (el) { return el != "team" && el != "region" });
+
+		// console.log(dataKeys);
+
+		d3.select("#controls")
+		.selectAll("button.teams")
+		.data(dataKeys)
+		.enter()
+		.append("button")
+		.attr("class", "btn-sm")
+		
+		// Registers an onclick behavior for each button, with a wrapper that gives access to the data that was bound to it when it was created
+		.on("click", buttonClick)
+		.html(function(d) {return d});
+
+// The function each button is calling on click, with the bound data sent automatically as the first argument
+		function buttonClick(datapoint) {
+			var maxValue = d3.max(incomingData,function(d) {
+				return parseFloat(d[datapoint])
+			});
+
+			var radiusScale = d3.scaleLinear().domain([0,maxValue]).range([2,20]);
+ 				
+
+			d3.selectAll("g.overallG")
+			.select("circle")
+			.transition()
+			.duration(1000)
+			.attr("r", function(d) {return radiusScale(d[datapoint])});
+	
+		}
+
+		function highlightRegion(d,i) {
+
+			//console.log(this.parentElement);
+ 			d3.select(this)
+ 			.select("text")
+			//.transition()
+			//.duration(500)
+			.attr("y", 60)
+			// This time we used d as our variable, which is typical in the examples you’ll see online for D3 functionality.
+			//A s a result, we changed the inline function variable to p, so that it wouldn’t conflict.
+ 			.classed('highlight',true);
+
+ 			d3.selectAll('g.overallG')
+ 			.each(function(p,i){
+ 				p.region === d.region ?
+ 					d3.select(this).select('circle').classed('active', true) :
+ 					d3.select(this).select('circle').classed('inactive', true);
+ 			})
+ 			this.parentElement.appendChild(this);
+		}
+
+		function unHighlight() {
+  			d3.selectAll("g.overallG")
+  			.select("circle")
+			//.transition()
+			//.duration(500)
+  			.classed("active",false)
+  			.classed("inactive",false);
+  			
+  			d3.selectAll("g.overallG")
+  			.select("text")
+			//.transition()
+			//.duration(500)
+  			.attr("y", 30)
+  			.classed("highlight", false);
+  		}
+
+  		// One thing we can do to easily disable mouse events on elements is to set the style property "pointer-events" of those ele- ments to "none".
+  		teamG.select("text").style("pointer-events","none");
+		teamG.on("mouseover",highlightRegion);
+		teamG.on("mouseout", unHighlight);
+
+		/*
+		d3.selectAll("circle").each(function(d,i) {
+    		console.log(d); // Object {team: "Netherlands", region: "UEFA", win: "6", loss: "0", draw: "1"…}
+    		console.log(i); // 0
+    		console.log(this); // <circle r="20"></circle>
+		});
+*/
+
+	}
+
+
+
+	d3.csv("/data/worldcup.csv", function(data) {
+    	overallTeamViz(data);
+  	});
+
+
+
+})(window, d3);	
+
+	
+</script>
+
+<script src="../dist/js/prism.js" type="text/JavaScript"></script>
+
+</body>
+
+</html>

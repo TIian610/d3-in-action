@@ -1,0 +1,407 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> 
+
+<html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>D3 in Action</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+		<link rel="icon"  type="image/png" href="../favicon.png" />        
+		<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+        <link rel="stylesheet" href="../dist/css/normalize.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="../dist/css/skeleton.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="../dist/css/prism.css" rel="stylesheet" type="text/css">
+        
+        <link rel="stylesheet" href="../dist/css/app.css" rel="stylesheet" type="text/css">
+        
+        
+
+        
+</head>
+
+
+
+<style>
+	
+		svg {
+
+			width: 100%;
+			height: 500px;
+			border: 1px lightgray solid;
+			background-color: #ffffff;
+		}
+
+	
+</style>
+
+<body id="first-App">
+
+
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+		    
+		    <h1><a href="../index.html" media="all" accesskey="0" title="D3 in action">D3 in action</a></h1>
+		    <p>Elijah Meeks</p>
+		    <p>Manning 2015</p>
+	    </div>
+	  </div>
+	</div>
+
+
+<article>
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+			<h3 id="Listing1.7">1.6 Your First App | Hello World with divs</h3>
+			
+		    <div id="d3-container">
+		    </div>
+			<p class="caption">Figure 1.31 Using console.log(), you can test to see if an event is properly firing. Here you create a &lt;div&gt; and assign an onclick event handler using the .on() syntax. When you click that element and fire the event, the action is noted in the console.</p>
+
+	    </div>
+	  </div>
+	</div>
+		
+		
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+
+
+			    <pre><code class="language-markup"> <script type="prism-html-markup">
+<div id="d3-container"></div>
+				</script>			    
+				</code></pre>
+	
+
+		
+			 <pre><code class="language-js">
+let div = {};
+d3.select("#d3-container")
+	.append("div")
+	.style("background-color", "pink")
+	.style("border", "1px black solid")	
+	.style("font-size", "24px")	
+	.style('padding-left', '20px')
+	.style("opacity", .8)
+	.style("cursor", 'pointer') 
+	.attr("id", "newDiv")
+    .attr("class", "d3div")
+    .on("click", function() {
+    	let active = div.active ? false : true,
+    		newOpacity = active ? 0.2 : 1;
+        d3.select(this).style("opacity", newOpacity);
+		div.active = active;
+    })
+    .text('Hello Div');
+	
+			</code></pre>
+
+	    </div>
+	  </div>
+	</div>
+	
+	
+</article>
+
+
+
+<article>
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+			<h3 id="Listing1.9">1.6 Your First App | Hello World with circles
+</h3>
+			
+		    <div id="vizcontainer">
+		    	<svg viewBox="0 0 500 500"></svg>
+		    </div>
+
+			<p class="caption">Figure 1.32 The result of running listing 1.10 in the console is the creation of two circles, a line, and two text elements. The order in which these elements are drawn results in the first label covered by the circle drawn later.</p>
+	    </div>
+	  </div>
+	</div>
+	
+
+		
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+
+
+			    <pre><code class="language-markup"> <script type="prism-html-markup">
+
+<div id="vizcontainer">
+	<svg viewBox="0 0 100 100"></svg>
+</div>
+
+				</script>
+				</code></pre>
+	
+
+		
+			 <pre><code class="language-js">
+
+const d3Svg = d3.select("#vizcontainer svg");
+		
+		d3Svg
+		  .append("line")
+		  .attr("x1", 20)
+		  .attr("y1", 20)
+		  .attr("x2",400)
+		  .attr("y2",400)
+		  .style("stroke", "black")
+		  .style("stroke-width","1px");
+		d3Svg		  
+		  .append("text")
+		  .attr("x",50)
+		  .attr("y",20)
+		  .text("Hello");
+		d3Svg		  
+		  .append("circle")
+		  .attr("r", 20)
+		  .attr("cx",20)
+		  .attr("cy",20)
+		  .style("fill","red");
+		d3Svg		  
+		  .append("circle")
+		  .attr("r", 100)
+		  .attr("cx",400)
+		  .attr("cy",400)
+		  .style("fill","lightblue");
+		d3Svg		  
+		  .append("text")
+		  .attr("x",370)
+		  .attr("y",400)
+		  .text("WORLD");
+
+			</code></pre>
+
+		    
+	    </div>
+	  </div>
+	</div>
+	
+	
+</article>
+
+<article>
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+			<h3 id="Listing1.11">1.6 Your First App | A conversation with D3
+</h3>
+			<p class="caption"><small>Reload the browser to see it in action.</small></p>
+			
+		    <div id="vizcontainer-2">
+		    	<svg viewBox="0 0 500 500"></svg>
+		    </div>
+
+			<p class="caption">Figure 1.33 Transition behavior when associated with a delay results in a pause before the application of the attribute or style.</p>
+			<p class="caption">Figure 1.34 Transition behavior when associated with position makes the shape graphically move to its new position over the course of the assigned duration. Because you used the same y position for both circles, the first circle moves down and the second circle moves up to the y position you set, which is between the two circles.</p>
+
+
+	    </div>
+	  </div>
+	</div>
+	
+
+		
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+
+
+			    <pre><code class="language-markup"> <script type="prism-html-markup">
+
+<div id="vizcontainer-2">
+	<svg viewBox="0 0 100 100"></svg>
+</div>
+
+				</script>
+				</code></pre>
+	
+
+		
+			 <pre><code class="language-js">
+
+const d3Svg2 = d3.select('#vizcontainer-2 svg');
+
+d3Svg2
+  .append("circle")
+  .attr("r", 20)
+  .attr("cx",20)
+  .attr("cy",20)
+  .style("fill","red");
+d3Svg2
+  .append("text")
+  .attr("id", "a")
+  .attr("x",50)
+  .attr("y",20)
+  .style("opacity", 0)
+  .text("Hello World");
+d3Svg2
+  .append("circle")
+  .attr("r", 100)
+  .attr("cx",400)
+  .attr("cy",400)
+  .style("fill","lightblue");
+d3Svg2
+  .append("text")
+  .attr("id", "b")
+  .attr("x",370)
+  .attr("y",400)
+  .style("opacity", 0)
+  .text("Uh, hi.");
+
+d3.select("#a").transition().delay(1000).style("opacity", 1); 
+d3.select("#b").transition().delay(3000).style("opacity", .75);
+d3.selectAll(".circle").transition().duration(2000).attr("cy", 250);
+
+			</code></pre>
+
+		    
+	    </div>
+	  </div>
+	</div>
+	
+	
+</article>
+
+<script src="../dist/js/vendors/d3.min.js" type="text/JavaScript"></script>
+
+<script>
+	
+
+(function(scope, d3) {
+
+
+	// Listing 1.8 Using d3.select to set attributes and event listeners
+
+	let div = {};
+	d3.select("#d3-container")
+		.append("div")
+		.style("background-color", "pink")
+		.style("border", "1px black solid")	
+		.style("font-size", "24px")	
+		.style('padding-left', '20px')
+		.style("opacity", .8)
+		.style("cursor", 'pointer') 
+ 
+		.attr("id", "newDiv")
+        .attr("class", "d3div")
+
+        .on("click", function() {
+
+        	let active = div.active ? false : true,
+        		newOpacity = active ? 0.2 : 1;
+	        d3.select(this).style("opacity", newOpacity);
+			div.active = active;
+
+        })
+        .text('Click Me!');
+
+
+
+
+        // Listing 1.10 Creating lines and circles with select and append
+
+        const d3Svg = d3.select("#vizcontainer svg");
+		
+		d3Svg
+		  .append("line")
+		  .attr("x1", 20)
+		  .attr("y1", 20)
+		  .attr("x2",400)
+		  .attr("y2",400)
+		  .style("stroke", "black")
+		  .style("stroke-width","1px");
+		d3Svg		  
+		  .append("text")
+		  .attr("x",50)
+		  .attr("y",20)
+		  .text("Hello");
+		d3Svg		  
+		  .append("circle")
+		  .attr("r", 20)
+		  .attr("cx",20)
+		  .attr("cy",20)
+		  .style("fill","red");
+		d3Svg		  
+		  .append("circle")
+		  .attr("r", 100)
+		  .attr("cx",400)
+		  .attr("cy",400)
+		  .style("fill","lightblue");
+		d3Svg		  
+		  .append("text")
+		  .attr("x",370)
+		  .attr("y",400)
+		  .text("WORLD");
+
+
+
+		// Listing 1.11 SVG elements with IDs and transparency
+
+		const d3Svg2 = d3.select('#vizcontainer-2 svg');
+
+		d3Svg2
+		  .append("circle")
+		  .attr("r", 20)
+		  .attr("cx",20)
+		  .attr("cy",20)
+		  .attr('class', 'circle')
+		  .style("fill","red");
+		d3Svg2
+		  .append("text")
+		  .attr("id", "a")
+		  .attr("x",50)
+		  .attr("y",20)
+		  .style("opacity", 0)
+		  .text("Hello World");
+		d3Svg2
+		  .append("circle")
+		  .attr("r", 100)
+		  .attr("cx",400)
+		  .attr("cy",400)
+		  .attr('class', 'circle')
+		  .style("fill","lightblue");
+		d3Svg2
+		  .append("text")
+		  .attr("id", "b")
+		  .attr("x",370)
+		  .attr("y",400)
+		  .style("opacity", 0)
+		  .text("Uh, hi.");
+
+		d3.select("#a").transition().delay(1000).style("opacity", 1); 
+		d3.select("#b").transition().delay(3000).style("opacity", .75);
+		d3.selectAll(".circle").transition().duration(2000).attr("cy", 250);
+
+
+})(window, d3);	
+
+	
+</script>
+
+<script src="../dist/js/prism.js" type="text/JavaScript"></script>
+
+</body>
+
+</html>

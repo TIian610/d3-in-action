@@ -1,0 +1,355 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> 
+
+<html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>D3 in Action</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+		<link rel="icon"  type="image/png" href="../favicon.png" />        
+		<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+        <link href="../dist/css/normalize.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/skeleton.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/prism.css" rel="stylesheet" type="text/css">
+
+        <link rel="stylesheet" href="../dist/css/app.css" rel="stylesheet" type="text/css">
+        
+        
+
+        
+</head>
+
+
+
+	<style rel="stylesheet" type="text/css">
+		.path {
+			stroke: steelblue;
+			stroke-width: 2 ;
+			fill: none;
+		}
+		
+		.axis {
+		  shape-rendering: crispEdges;
+		}
+
+
+		.y.axis line, .y.axis path {
+		  fill: none;
+		  stroke: #000;
+		}
+
+	</style>
+
+<body>
+
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+		    
+		    <h1><a href="../index.html" media="all" accesskey="0" title="D3 in action">D3 in action</a></h1>
+		    <p>Elijah Meeks</p>
+		    <p>Manning 2015</p>
+	    </div>
+	  </div>
+	</div>
+
+
+
+<article>
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+			<h3 id="data">Bonus: 4.1.1 Introducing D3 Path Generators</h3>
+			<p><small>Click the bars.</small></p>
+			<div id="viz">
+			</div>
+
+			<p class="caption">The effect of the different interpolate values for path generators.</p>
+
+
+
+
+	    </div>
+	  </div>
+	</div>
+		
+		
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+
+			<pre><code class="language-markup"> <script type="prism-html-markup">
+<div id="viz">
+</div>
+</script>			    
+			</code></pre>
+	
+			<pre><code class="language-js">
+
+
+var h = 500,
+	w = 500;
+var margin = {top: 0, right: 0, bottom: 0, left: 0};
+var width =  w - margin.left - margin.right,
+	height = h - margin.top -  margin.bottom;
+
+
+var data = [
+
+    {	
+    	"g1":{"class": "g1", "attribute": "transform", "type": "translate", "x":0, "y": 0},
+    	"g2":{"class": "g2", "attribute": "transform", "type": "translate(50, 50)", "scale":"scale(1)", "rotate":"rotate(0)", "skew":"skewX(0) skewY(0)", "text": "'transform', 'translate(50, 50)'" },
+    	"circle": {"cx": 20, "cy": 20, "radius": 20, "color" : "red" },
+    	"rect": {"x": 0, "y": 0, "width": 40, "height": 40, "color" : "blue"}
+    },
+
+    {	
+    	"g1":{"class": "g1", "attribute": "transform", "type": "translate", "x":260, "y": 0},
+    	"g2":{"class": "g2", "attribute": "transform", "type": "translate(70, 50)", "scale":"scale(1)", "rotate":"rotate(30)", "skew":"skewX(0) skewY(0)", "text": "'transform', 'rotate(30)'"},
+    	"circle": {"cx": 20, "cy": 20, "radius": 20, "color" : "red" },
+    	"rect": {"x": 0, "y": 0, "width": 40, "height": 40, "color" : "blue"}
+    },
+    {	
+    	"g1":{"class": "g1", "attribute": "transform", "type": "translate", "x":0, "y": 250},
+    	"g2":{"class": "g2", "attribute": "transform", "type": "translate(70, 50)", "scale":"scale(2)", "rotate":"rotate(0)", "skew":"skewX(0) skewY(0)", "text": "'transform', 'scale(2)'"},
+    	"circle": {"cx": 20, "cy": 20, "radius": 20, "color" : "red" },
+    	"rect": {"x": 0, "y": 0, "width": 40, "height": 40, "color": "blue"}
+    },
+    {	
+    	"g1":{"class": "g1", "attribute": "transform", "type": "translate", "x":250, "y": 250},
+    	"g2":{"class": "g2", "attribute": "transform", "type": "translate(70, 50)", "scale":"scale(1)", "rotate":"rotate(0)", "skew":"skewX(20) skewY(5)", "text": "'skewX(20) skewY(5)'"},
+    	"circle": {"cx": 20, "cy": 20, "radius": 20, "color" : "red" },
+    	"rect": {"x": 0, "y": 0, "width": 40, "height": 40, "color": "blue"}
+    }
+
+
+
+];
+
+var t = d3.transition()
+.delay(1000)
+.duration(750)
+.ease(d3.easeLinear);
+ //mySVG.attr("transform", "translate(50,50)");
+ //mySVG.attr("transform", "translate(70, 50) rotate(30)");
+ //mySVG.attr("transform", "scale(2)");
+
+
+// DRAW
+// Draw the SVG
+
+var mySVG = d3.select("#viz")
+	.append("svg")
+	.attr("width", w)
+	.attr("height", h)
+	.attr("preserveAspectRatio", "xMinYMin meet")
+	.attr("viewBox", "0 0 500 500")
+	.append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	mySVG.selectAll('g')
+	.data(data)
+	.enter()
+	.append('g')
+	.attr('class', function (d) { return d.g1.class })
+	.attr('transform', function (d) { return d.g1.type + '(' + d.g1.x + ',' +  d.g1.y  + ')' })
+	.each(function(d, i){
+		d3.select(this)
+		.append('text')
+	    .attr("x", 0)
+		.attr("y", 0)
+		.attr("dy", 25)
+		.attr("dx", 0)
+	    .text(function (d){ 
+
+	            return  d.g2.text;
+		})
+
+	})
+	.append('g')
+	.attr('class', 'uhhhh')
+				.transition(t)
+
+	.attr("transform", function(d){ return d.g2.type + ' ' + d.g2.scale + ' ' + d.g2.rotate + ' ' + d.g2.skew})
+
+	.each(function(d, i) {
+		d3.select(this)
+		.append('rect')
+		.attr("y", 0)
+		.attr("x", 0)
+		.attr("width", 40)
+		.attr("height", 40)
+		.style("fill", "blue");
+
+	})
+
+	.each(function(d, i) {
+		d3.select(this)
+		.append('circle')
+		.transition(t)
+		.attr("cx", 40)
+		.attr("cy", 40)
+		.attr("r", 20)
+		.attr("fill", 'red');
+
+
+
+	});
+
+
+			</code></pre>
+
+	    </div>
+	  </div>
+	</div>
+	
+	
+</article>
+
+
+<script src="../dist/js/vendors/d3.min.js" type="text/javaScript"></script>
+
+<!-- http://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3 -->
+<script src="../dist/js/colorbrewer.js" type="text/javascript"></script>
+
+<script>
+	
+// https://www.dashingd3js.com/svg-text-element
+// http://bl.ocks.org/milroc/4254604
+// http://bl.ocks.org/benjchristensen/2579599
+// https://bl.ocks.org/shimizu/f7ef798894427a99efe5e173e003260d
+// https://bl.ocks.org/d3noob/ced1b9b18bd8192d2c898884033b5529
+// https://github.com/d3/d3-shape#curves
+// http://www.pshrmn.com/tutorials/d3/shapes/
+(function(scope, d3) {
+
+
+	var h = 250,
+		w = 250;
+	var margin = {top: 30, right: 10, bottom: 30, left: 30};
+	var width =  w - margin.left - margin.right,
+    	height = h - margin.top -  margin.bottom;
+	
+
+    var data = [
+
+    	{'path': [0, 25, 50, 75, 100, 125, 150, 175, 200]},
+		{'path': [0, 25, 50, 75, 100, 125, 150, 175, 200]},
+    	{'path': [0, 25, 50, 75, 100, 125, 150, 175, 200]},
+    	{'path': [0, 25, 50, 75, 100, 125, 150, 175, 200]},
+    ];
+
+	var curveArray = [
+	    {"d3Curve":d3.curveLinear,"curveTitle":"curveLinear"},
+	    {"d3Curve":d3.curveStep,"curveTitle":"curveStep"},
+	    {"d3Curve":d3.curveBasis,"curveTitle":"curveBasis"},
+	    {"d3Curve":d3.curveCatmullRom,"curveTitle":"curveCatmullRom"}
+  	];
+
+    var dataLength = data[0].path.length;
+	var t = d3.transition()
+    .duration(1000)
+    .ease(d3.easeLinear)
+    .on("start", function(d){ console.log("transiton start") })
+    .on("end", function(d){ console.log("transiton end") });
+
+
+    // SCALES
+	var x = d3.scaleLinear().domain([0, dataLength]).range([0, width]);
+	var y = d3.scaleLinear().domain([0, d3.max(data[0].path)]).range([height, 0]);
+
+	// LINES
+
+	
+	var line = d3.line()
+			// assign the X function to plot our line as we wish
+			.x(function(d,i) { 
+				
+				console.log("counter", i);
+				// verbose logging to show what's actually being done
+				console.log('Plotting X value for data point: ' + d + ' using index: ' + i + ' to be at: ' + x(i) + ' using our xScale.');
+				// return the X coordinate where we want to plot this datapoint
+				return x(i); 
+			})
+			.y(function(d) { 
+				// verbose logging to show what's actually being done
+				console.log('Plotting Y value for data point: ' + d + ' to be at: ' + y(d) + " using our yScale.");
+				// return the Y coordinate where we want to plot this datapoint
+
+				if(d % 50 === 0){ 
+					return y(150); 
+				}else{
+					return y(50); 
+				}
+			}).curve(d3.curveCatmullRom.alpha(0.5));
+
+
+	
+	// AXIS
+	var xAxis = d3.axisBottom(x).ticks(dataLength, "s");
+	// DRAW
+	// Draw the SVG
+
+	var yAxis = d3.axisLeft(y);
+
+	var mySVG = d3.select("#viz");
+
+	mySVG.selectAll("svg")
+    	.data(data)
+		.enter()
+		.append('svg:svg')
+		.attr("width", w)
+    	.attr("height", h)
+    	.attr("preserveAspectRatio", "xMinYMin meet")
+    	.attr("viewBox", "0 0 250 250")
+    	.append("svg:g")
+    	.attr('class', function(d, i){ return "chart chart-" + (i + 1) })
+    	.each(function(d, i){
+    		d3.select(this)
+			.append("svg:g")
+			.attr("class", "x axis")
+			.attr("transform", "translate(" + margin.left + "," + (h - margin.bottom) + ")")
+			.call(xAxis);
+
+    		d3.select(this)
+			.append("svg:g")
+			.attr("class", "y axis")
+			.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+			.call(yAxis);
+
+
+
+    	})
+    	.each(function(d, i){
+	    	console.log("this is------------", d3.select(this));	
+			d3.select(this)
+				.append("svg:path")
+				.attr("class", "path line")
+				.attr("d", line(d.path))			
+				.attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
+
+    	});
+
+
+
+
+})(window, d3);	
+
+	
+</script>
+<script src="../dist/js/prism.js" type="text/javaScript"></script>
+
+</body>
+
+</html>

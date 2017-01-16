@@ -1,0 +1,268 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> 
+
+<html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>D3 in Action</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+		<link rel="icon"  type="image/png" href="../favicon.png" />        
+		<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+        <link rel="stylesheet" href="../dist/css/normalize.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="../dist/css/skeleton.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="../dist/css/prism.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="../dist/css/app.css" rel="stylesheet" type="text/css">
+        
+        
+
+        
+</head>
+
+
+
+<style>
+	
+	
+</style>
+
+<body>
+
+
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+		    
+		    <h1><a href="../index.html" media="all" accesskey="0" title="D3 in action">D3 in action</a></h1>
+		    <p>Elijah Meeks</p>
+		    <p>Manning 2015</p>
+	    </div>
+	  </div>
+	</div>
+
+
+<article>
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+			<h3 id="Fig_01_26">1.3.5 JavaScript | Method Chaining</h3>
+			
+		    <div id="d3-container">
+				<div>
+					Only one div
+				</div>	
+		    </div>
+			<p class="caption">Figure 1.25 By binding an array of four values to a selection of &lt;div&gt; elements on the page, the .enter() function created three new &lt;div&gt; elements to reflect the size mismatch between the data array and the selection.</p>
+			<p class="caption">Figure 1.26 Inspecting the DOM shows that the new &lt;div&gt; elements have been created with unformatted content followed by the child &lt;span&gt; element with style and content set by your code.</p>
+
+	    </div>
+	  </div>
+	</div>
+		
+		
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+
+
+			    <pre><code class="language-markup"> <script type="prism-html-markup">
+<div id="d3-container">
+	<div>
+		Only one div
+	</div>	
+</div>
+</script>			    
+				</code></pre>
+	
+		
+		
+			 <pre><code class="language-js">
+var someData = ["filler", "filler", "filler", "filler"];
+				 
+d3.select("#d3-container")
+	.selectAll("div")
+	// Counts and parses our data values. 
+	//There are four values in our data set, so everything past this point is executed four times, once for each value.
+	.data(someData)
+	// To create new, data-bound elements, you must use enter(). 
+	// This method looks at the DOM, and then at the data being handed to it. 
+	// If there are more data values than corresponding DOM elements, 
+	// then enter() creates a new placeholder element on which you may work your magic. 
+	// It then hands off a reference to this new placeholder to the next step in the chain.
+	.enter()
+	// Takes the placeholder selection created by enter() and inserts a div element into the DOM. 
+	// Hooray! Then it hands off a reference to the element it just created to the next step in the chain.
+	.append("div")
+	.html("Wow")
+	.append("span")
+	.html(" | Even More Wow")
+	.style("font-weight", "900");
+		
+			</code></pre>
+
+		    
+	    </div>
+	  </div>
+	</div>
+	
+	
+</article>
+
+
+<article>
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+			<h3 id="Fig_01_27">1.3.5 JavaScript | Arrays and Array Function</h3>
+			
+		    <div id="d3-container-2">
+				<div>
+					Only one div
+				</div>	
+		    </div>
+			<p class="caption">Figure 1.27 Running JavaScript in the console allows you to test your code. Here you’ve created a new array called smallerNumbers that consists of only three values, which you can then use as your data in a selection to update and create new elements.</p>
+	    </div>
+	  </div>
+	</div>
+		
+		
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+
+
+			    <pre><code class="language-markup"> <script type="prism-html-markup">
+<div id="d3-container-2">
+	<div>
+		Only one div
+	</div>	
+</div>
+</script>			    
+				</code></pre>
+	
+		
+		
+			 <pre><code class="language-js">
+
+const someNumbers = [17, 82, 9, 500, 40];
+const someColors = ["blue", "red", "chartreuse", "orange"];
+
+	 	
+let smallerNubersFilter = someNumbers.filter(function(index) {
+	return index <= 40 ? this : null;
+});	// -> :: 17,9,40
+
+d3.select("#d3-container-2")
+	.selectAll("div")
+	.data(smallerNubersFilter)
+	.enter()
+	.append("div")
+
+	//  the first variable (typically represented with the letter d, 
+	// but you can declare it as whatever you want) contains the data value bound to that element, 
+	// and the second variable returns the array position (known as an index, 
+	// hence the variable name i) of the value bound to that element. 
+
+	.style("background", function(d,i) {return someColors[i-1]})
+	.attr("cx", function(d,i) {return i})
+	.html(function(d,i) {return d});
+
+		
+			</code></pre>
+
+
+		    
+	    </div>
+	  </div>
+	</div>
+	
+	
+</article>
+
+
+
+
+<script src="../dist/js/vendors/d3.min.js" type="text/JavaScript"></script>
+
+<script>
+	
+
+(function(scope, d3) {
+
+
+	// 1.3.5 JavaScript | Method Chaining
+	var someData = ["filler", "filler", "filler", "filler"];
+	
+	d3.select("#d3-container")
+		.selectAll("div")
+		.data(someData)
+		.enter()
+		.append("div")
+		.html("Wow")
+		.append("span")
+		.html(" | Even More Wow")
+		.style("font-weight", "900");
+		
+
+
+
+	// 1.3.5 JavaScript | Arrays and Array Function
+	const someNumbers = [17, 82, 9, 500, 40];
+	const someColors = ["blue", "red", "chartreuse", "orange"];
+	const somePeople = [
+		{name: "Peter", age: 27}, 
+		{name: "Sulayman", age: 24},
+		{name: "K.C.", age: 49}
+	];
+
+	// filter()
+
+	let someNumbersFilter = someNumbers.filter(function(el) {return el >= 40});
+	console.log(`someNumbersFilter :: ${someNumbersFilter}`);	// --> Array [3] --> SomePeopleFilter :: 82,500,40
+
+	let someColorsFilter = someColors.filter(function(el) {
+		return el.length < 5;
+	});
+	console.log(`someColorsFilter :: ${someColorsFilter}`);	// --> Array [2] --> someColorsFilter :: blue,red
+
+	let smallerNubersFilter = someNumbers.filter(function(index) {
+		return index <= 40 ? this : null;
+	});
+	console.log(`smallerNubersFilter :: ${smallerNubersFilter}`);	// --> mallerNubersFilter :: 17,9,40
+
+
+
+	d3.select("#d3-container-2")
+		.selectAll("div")
+		.data(smallerNubersFilter)
+  		.enter()
+  		.append("div")
+		.style("background", function(d,i) {console.log(i);return someColors[i-1]})
+		.style('color', 'white')
+		.style('padding-left', '20px')
+		.attr("cx", function(d,i) {return i})
+		.html(function(d,i) {return d});
+
+
+})(window, d3);	
+
+	
+</script>
+
+<script src="../dist/js/prism.js" type="text/JavaScript"></script>
+
+</body>
+
+</html>

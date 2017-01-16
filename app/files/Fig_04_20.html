@@ -1,0 +1,728 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> 
+
+<html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>D3 in Action</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+		<link rel="icon"  type="image/png" href="../favicon.png" />        
+		<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+        <link href="../dist/css/normalize.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/skeleton.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/prism.css" rel="stylesheet" type="text/css">
+
+        <link rel="stylesheet" href="../dist/css/app.css" rel="stylesheet" type="text/css">
+        
+        
+
+        
+</head>
+
+
+
+	<style rel="stylesheet" type="text/css">
+		line {
+ 			shape-rendering: crispEdges;
+			stroke: #000;
+		}
+		line.minor  {
+  			stroke: #777777;
+  			stroke-dasharray: 2,2;
+		}
+		path.domain {
+  			fill: none;
+  			stroke: black;
+		}
+		text {
+			font-family: sans-serif;
+			font-size: 14px;
+		}
+
+		.tick text {
+			font-family: sans-serif;
+			font-size: 11px;
+		}
+		circle {
+			pointer-events: all;
+			-moz-transition: all 0.3s;
+			-webkit-transition: all 0.3s;
+			-o-transition: all 0.3s;
+			transition: all 0.3s;
+		}
+
+		#yAxisGGrid text{
+			display: none;
+		}
+		#yAxisGGrid line{
+			stroke-dasharray: 1
+		}
+
+
+	</style>
+
+<body>
+
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+		    
+		    <h1><a href="../index.html" media="all" accesskey="0" title="D3 in action">D3 in action</a></h1>
+		    <p>Elijah Meeks</p>
+		    <p>Manning 2015</p>
+	    </div>
+	  </div>
+	</div>
+
+
+
+<article>
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+			<h3 id="data">4.4.3 Exploring line interpolators: line() and curve()</h3>
+				<div id="viz">
+				</div>
+		    <pre><code class="language-js">
+
+day,tweets,retweets,favorites
+1,1,2,5
+2,6,11,3
+3,3,0,1
+4,5,2,6
+5,10,29,16
+6,4,22,10
+7,3,14,1
+8,5,7,7
+9,1,35,22
+10,4,16,15
+			</code></pre>
+
+			<p class="caption">Figure 4.20 Orange: “curveStepBefore” interpolation; Red: 'curveMonotoneX' interpolation; Green: 'curveCatmullRom' interpolation.</p>
+
+
+
+
+	    </div>
+	  </div>
+	</div>
+		
+		
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+
+			<pre><code class="language-markup"> <script type="prism-html-markup">
+<div id="viz">
+</div>
+</script>			    
+			</code></pre>
+	
+	
+
+
+
+
+		
+			 <pre><code class="language-js">
+d3.csv("../data/tweetdata.csv", lineChart);
+var h = 540,
+	w = 500;
+var margin = {top: 40, right: 30, bottom: 20, left: 10};
+var width =  w - margin.left - margin.right,
+	height = h - margin.top -  margin.bottom;
+
+
+function lineChart(data) {
+
+	// Max-min values
+	var xMax = d3.max(data, function(d){ return + d.day});
+	var xMin = d3.min(data, function(d){ return + d.day});
+	var addxMax = xMax + .5;
+	// var yExtent = d3.extent(data, function(d) {return d.friends});
+
+	// Escales
+	var xScale = d3.scaleLinear().domain([xMin, addxMax]).range([0,width]);
+	// Scale is inverted, so higher values are drawn higher up and lower values toward the bottom
+	var yScale = d3.scaleLinear().domain([0,35]).range([h-margin.top-margin.bottom, 0]);
+	
+
+	// Axis
+	var yAxis = d3.axisRight(yScale).tickSize(width).tickPadding(5);
+	var yAxisGrid = d3.axisRight(yScale).tickSize(width).ticks(34, "f").tickPadding(5);
+	// A negative tickSize draws the lines above the axis, but we 
+	// need to make sure to offset the axis by the same value.
+	var xAxis = d3.axisBottom(xScale).tickSize(- height).tickPadding(5);
+
+	var color = d3.scaleOrdinal(d3.schemeCategory10);
+	console.log(color());
+
+	var mySVG = d3.select("#viz")
+	.append("svg")
+	.attr("width", w)
+	.attr("height", h)
+	.attr("preserveAspectRatio", "xMinYMin meet")
+	.attr("viewBox", "0 0 500 500")
+	.append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	mySVG.append("g")
+	.attr("id", "xAxisG")
+	.call(xAxis);
+
+	d3.selectAll("#xAxisG")
+	.attr("transform","translate(0," + height + ")");
+
+	mySVG.append("g").attr("id", "yAxisGGrid").call(yAxisGrid);
+
+	mySVG.append("g").attr("id", "yAxisG").call(yAxis);
+
+	// Lines
+	// Defines an accessor for data like ours; in this case we take the day attribute and pass it to xScale first.
+	// This accessor does the same for the number of tweets.
+	// A more efficient way to do this would be to define one line generator, 
+	// and then modify the .y() accessor on the fly as we call it for each line.
+	// But it’s easier to see the functionality this way.
+
+
+	// We can add this code right after we create our line generators 
+	// curve functions:
+	 		
+	// d3.curveStep
+	// d3.curveStepBefore
+	// d3.curveStepAfter
+	// d3.curveBasis
+	// d3.curveCardinal
+	// d3.curveMonotoneX
+	// d3.curveCatmullRom
+
+	var tweetLine = d3.line()
+	.curve(d3.curveStepBefore)
+    .x(function(d) {
+        return xScale(d.day)
+    })
+    .y(function(d) {
+        return yScale(d.tweets)
+    });
+
+    var retweetLine = d3.line()
+	.curve(d3.curveMonotoneX)
+    .x(function(d) {
+        return xScale(d.day)
+	})
+    .y(function(d) {
+    	return yScale(d.retweets)
+	}) // Notice how only the y accessor is different between each line generator.
+
+	var favLine = d3.line()
+	.curve(d3.curveCatmullRom)
+    .x(function(d) {
+    	return xScale(d.day)
+	})
+    .y(function(d) {
+    	return yScale(d.favorites)
+	});
+
+    // The appended path is drawn according to the generator with the loaded tweetdata passed to it.
+    // Each line generator needs to be called by a corresponding new <path> element .
+    mySVG.append("path")
+    .attr('id', 'tweetsLine')
+    .attr("d", tweetLine(data))
+    .attr("fill", "none")
+    //.attr("stroke", "darkred")
+    .style('stroke', function(){ return color(2); })
+    .attr("stroke-width", 2);
+
+    mySVG.append("path")
+	.attr('id', 'retweetsLine')
+    .attr("d", retweetLine(data))
+    .attr("fill", "none")
+    .style('stroke', function(){ return color(4); })
+    .attr("stroke-width", 2);
+
+    mySVG.append("path")
+    .attr('id', 'favoritesLine')
+    .attr("d", favLine(data))
+    .attr("fill", "none")
+    .style('stroke', function(){ return color(6); })
+    .attr("stroke-width", 2)
+
+    // Each of these uses the same dataset, but bases the y position on tweets, 
+    // retweets, and favorites values, respectively.
+	
+	// Tweets dots
+	mySVG.selectAll("circle.tweets")
+	.data(data)
+	.enter()
+	.append("circle")
+	.attr("class", "tweets")
+	.attr('id', function(d){ return 'circle-tweets-' + d.day})
+	.attr("r", function(d) {return +5 })
+	.attr("cx", function(d) {return xScale(d.day)})
+	.attr("cy", function(d) {return yScale(d.tweets)})
+	.style('fill', function(){ return color(2); })
+    .style('stroke', 'white')
+    .attr("stroke-width", 1);
+
+	// Retweets dots
+	mySVG.selectAll("circle.retweets")
+	.data(data)
+	.enter()
+	.append("circle")
+	.attr('id', function(d){ return 'circle-retweets-' + d.day})
+	.attr("class", "retweets")
+	.attr("r", function(d) {return +5 })
+	.attr("cx", function(d) {return xScale(d.day)})
+	.attr("cy", function(d) {return yScale(d.retweets)})
+	.style('fill', function(){ return color(4); })
+    .style('stroke', 'white');
+
+	// Retweets dots
+	mySVG.selectAll("circle.favorites")
+	.data(data)
+	.enter()
+	.append("circle")
+	.attr("class", "favorites")
+	.attr('id', function(d){ return 'circle-fav-' + d.day})
+	.attr("r", function(d) {return +5 })
+	.attr("cx", function(d) {return xScale(d.day)})
+	.attr("cy", function(d) {return yScale(d.favorites)})
+	.style('fill', function(){ return color(6); })
+    .style('stroke', 'white');
+
+
+    var d3Selection = d3.selectAll('#tweetsLine, #retweetsLine, #favoritesLine, .tweets, .retweets, .favorites, line');
+    var s = -1;
+
+    function elToHighlight (el){
+
+    	var filterSelection = d3Selection.filter(d3.matcher(el));
+    	return filterSelection;
+
+    }
+
+    function onMouseOver (that, el){
+
+		s = elToHighlight(el);
+    	d3.select(that).select('text').transition().style("font-weight", '900').style("cursor", "pointer");
+    	d3Selection.transition().style('opacity', '0.1');
+    	s.transition().style('opacity', '1');
+
+
+    }
+
+    function onMouseLeave(that){
+		
+		d3.select(that).select('text').transition().style("font-weight", '400');
+		d3Selection.transition().style('opacity', '1');
+
+
+    }
+   
+    var chartKeys = mySVG.append('g')
+    .attr('class', 'keys')
+    .attr('transform', "translate(0,"+ - (margin.top - 20) + ")");
+
+    var tweetsKey = chartKeys.append('g')
+    .attr('transform', "translate(0,0)")
+    .style('opacity', 1)
+    .on('mouseover', function(){
+
+    	onMouseOver(this, '#tweetsLine, .tweets');
+    })
+    .on('mouseleave', function(){
+
+    	onMouseLeave(this);
+    });
+
+    var retweetsKey = chartKeys.append('g')
+    .attr('transform', "translate(100,0)")
+    .style('opacity', 1)
+    .on('mouseover', function(){
+
+    	onMouseOver(this, '#retweetsLine, .retweets');
+    })
+    .on('mouseleave', function(){
+
+    	onMouseLeave(this);
+    });
+
+    var favoritesKey =  chartKeys.append('g')
+    .attr('transform', "translate(200,0)")
+    .style('opacity', 1)
+    .on('mouseover', function(){
+
+    	onMouseOver(this, '#favoritesLine, .favorites');
+    })
+    .on('mouseleave', function(){
+
+    	onMouseLeave(this);
+    });
+
+
+    tweetsKey
+    .append('circle')
+	.style('fill', function(){ return color(2); })
+    .attr('r', 5)
+    .attr('x', 0)
+    .attr('y', 0);
+
+    tweetsKey
+    .append('text')
+    .attr('x', 10)
+    .attr('y', 5)
+    .style("font-weight", '400')
+    .style('fill', 'black')
+    .text('Tweets');
+
+    retweetsKey
+    .append('circle')
+	.style('fill', function(){ return color(4); })
+    .attr('r', 5)
+    .attr('x', 0)
+    .attr('y', 0);
+
+    retweetsKey
+    .append('text')
+    .attr('x', 10)
+    .attr('y', 5)
+    .style('fill', 'black')
+    .text('Retweets');
+
+    favoritesKey
+    .append('circle')
+	.style('fill', function(){ return color(6); })
+    .attr('r', 5)
+    .attr('x', 0)
+    .attr('y', 0);
+
+    favoritesKey
+    .append('text')
+    .attr('x', 10)
+    .attr('y', 5)
+    .style('fill', 'black')
+    .text('Favorites');
+}
+
+
+		</code></pre>
+
+	    </div>
+	  </div>
+	</div>
+	
+	
+</article>
+
+
+<script src="../dist/js/vendors/d3.min.js" type="text/JavaScript"></script>
+
+<!-- http://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3 -->
+<script src="../dist/js/colorbrewer.js" type="text/javascript"></script>
+
+<script>
+	
+// http://bl.ocks.org/mbostock/1166403
+
+(function(scope, d3) {
+
+	d3.csv("../data/tweetdata.csv", lineChart);
+	var h = 540,
+		w = 500;
+	var margin = {top: 40, right: 30, bottom: 20, left: 10};
+	var width =  w - margin.left - margin.right,
+    	height = h - margin.top -  margin.bottom;
+	
+
+    function lineChart(data) {
+		console.log(data);
+		// Max-min values
+		var xMax = d3.max(data, function(d){ return + d.day});
+		var xMin = d3.min(data, function(d){ return + d.day});
+		var addxMax = xMax + .5;
+		// var yExtent = d3.extent(data, function(d) {return d.friends});
+
+		// Escales
+		var xScale = d3.scaleLinear().domain([xMin, addxMax]).range([0,width]);
+		// Scale is inverted, so higher values are drawn higher up and lower values toward the bottom
+    	var yScale = d3.scaleLinear().domain([0,35]).range([h-margin.top-margin.bottom, 0]);
+		
+
+		// Axis
+		var yAxis = d3.axisRight(yScale).tickSize(width).tickPadding(5);
+		var yAxisGrid = d3.axisRight(yScale).tickSize(width).ticks(34, "f").tickPadding(5);
+		// A negative tickSize draws the lines above the axis, but we 
+		// need to make sure to offset the axis by the same value.
+		var xAxis = d3.axisBottom(xScale).tickSize(- height).tickPadding(5);
+
+		var color = d3.scaleOrdinal(d3.schemeCategory10);
+		console.log(color());
+
+		var mySVG = d3.select("#viz")
+		.append("svg")
+    	.attr("width", w)
+    	.attr("height", h)
+    	.attr("preserveAspectRatio", "xMinYMin meet")
+    	.attr("viewBox", "0 0 500 500")
+  		.append("g")
+    	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    	mySVG.append("g")
+		.attr("id", "xAxisG")
+		.call(xAxis);
+
+		d3.selectAll("#xAxisG")
+		.attr("transform","translate(0," + height + ")");
+
+		mySVG.append("g").attr("id", "yAxisGGrid").call(yAxisGrid);
+
+		mySVG.append("g").attr("id", "yAxisG").call(yAxis);
+
+		// Lines
+		// Defines an accessor for data like ours; in this case we take the day attribute and pass it to xScale first.
+		// This accessor does the same for the number of tweets.
+		// A more efficient way to do this would be to define one line generator, 
+		// and then modify the .y() accessor on the fly as we call it for each line.
+		// But it’s easier to see the functionality this way.
+
+
+		// We can add this code right after we create our line generators 
+		// curve functions:
+
+		// d3.curveStep
+		// d3.curveStepBefore
+		// d3.curveStepAfter
+		// d3.curveBasis
+		// d3.curveCardinal
+		// d3.curveMonotoneX
+		// d3.curveCatmullRom
+
+		var tweetLine = d3.line()
+		.curve(d3.curveStepBefore)
+        .x(function(d) {
+	        return xScale(d.day)
+	    })
+        .y(function(d) {
+	        return yScale(d.tweets)
+	    });
+
+	    var retweetLine = d3.line()
+		.curve(d3.curveMonotoneX)
+        .x(function(d) {
+	        return xScale(d.day)
+    	})
+        .y(function(d) {
+        	return yScale(d.retweets)
+    	}) // Notice how only the y accessor is different between each line generator.
+
+    	var favLine = d3.line()
+		.curve(d3.curveCatmullRom)
+        .x(function(d) {
+        	return xScale(d.day)
+    	})
+        .y(function(d) {
+        	return yScale(d.favorites)
+    	});
+
+        // The appended path is drawn according to the generator with the loaded tweetdata passed to it.
+        // Each line generator needs to be called by a corresponding new <path> element .
+        mySVG.append("path")
+        .attr('id', 'tweetsLine')
+        .attr("d", tweetLine(data))
+        .attr("fill", "none")
+        //.attr("stroke", "darkred")
+        .style('stroke', function(){ return color(2); })
+        .attr("stroke-width", 2);
+
+        mySVG.append("path")
+		.attr('id', 'retweetsLine')
+        .attr("d", retweetLine(data))
+        .attr("fill", "none")
+        .style('stroke', function(){ return color(4); })
+        .attr("stroke-width", 2);
+
+        mySVG.append("path")
+        .attr('id', 'favoritesLine')
+        .attr("d", favLine(data))
+        .attr("fill", "none")
+        .style('stroke', function(){ return color(6); })
+        .attr("stroke-width", 2)
+
+        // Each of these uses the same dataset, but bases the y position on tweets, 
+        // retweets, and favorites values, respectively.
+		
+		// Tweets dots
+		mySVG.selectAll("circle.tweets")
+		.data(data)
+		.enter()
+		.append("circle")
+		.attr("class", "tweets")
+		.attr('id', function(d){ return 'circle-tweets-' + d.day})
+		.attr("r", function(d) {return +5 })
+		.attr("cx", function(d) {return xScale(d.day)})
+		.attr("cy", function(d) {return yScale(d.tweets)})
+		.style('fill', function(){ return color(2); })
+        .style('stroke', 'white')
+        .attr("stroke-width", 1);
+
+		// Retweets dots
+		mySVG.selectAll("circle.retweets")
+		.data(data)
+		.enter()
+		.append("circle")
+		.attr('id', function(d){ return 'circle-retweets-' + d.day})
+		.attr("class", "retweets")
+		.attr("r", function(d) {return +5 })
+		.attr("cx", function(d) {return xScale(d.day)})
+		.attr("cy", function(d) {return yScale(d.retweets)})
+		.style('fill', function(){ return color(4); })
+        .style('stroke', 'white');
+
+		// Retweets dots
+		mySVG.selectAll("circle.favorites")
+		.data(data)
+		.enter()
+		.append("circle")
+		.attr("class", "favorites")
+		.attr('id', function(d){ return 'circle-fav-' + d.day})
+		.attr("r", function(d) {return +5 })
+		.attr("cx", function(d) {return xScale(d.day)})
+		.attr("cy", function(d) {return yScale(d.favorites)})
+		.style('fill', function(){ return color(6); })
+        .style('stroke', 'white');
+
+
+        var d3Selection = d3.selectAll('#tweetsLine, #retweetsLine, #favoritesLine, .tweets, .retweets, .favorites, line');
+        var s = -1;
+
+        function elToHighlight (el){
+
+        	var filterSelection = d3Selection.filter(d3.matcher(el));
+        	return filterSelection;
+
+        }
+
+        function onMouseOver (that, el){
+
+			s = elToHighlight(el);
+        	d3.select(that).select('text').transition().style("font-weight", '900').style("cursor", "pointer");
+        	d3Selection.transition().style('opacity', '0.1');
+        	s.transition().style('opacity', '1');
+
+
+        }
+
+        function onMouseLeave(that){
+			
+			d3.select(that).select('text').transition().style("font-weight", '400');
+			d3Selection.transition().style('opacity', '1');
+
+
+        }
+       
+        var chartKeys = mySVG.append('g')
+        .attr('class', 'keys')
+        .attr('transform', "translate(0,"+ - (margin.top - 20) + ")");
+
+        var tweetsKey = chartKeys.append('g')
+        .attr('transform', "translate(0,0)")
+        .style('opacity', 1)
+        .on('mouseover', function(){
+
+        	onMouseOver(this, '#tweetsLine, .tweets');
+        })
+        .on('mouseleave', function(){
+
+        	onMouseLeave(this);
+        });
+
+        var retweetsKey = chartKeys.append('g')
+        .attr('transform', "translate(100,0)")
+        .style('opacity', 1)
+        .on('mouseover', function(){
+
+        	onMouseOver(this, '#retweetsLine, .retweets');
+        })
+        .on('mouseleave', function(){
+
+        	onMouseLeave(this);
+        });
+
+        var favoritesKey =  chartKeys.append('g')
+        .attr('transform', "translate(200,0)")
+        .style('opacity', 1)
+        .on('mouseover', function(){
+
+        	onMouseOver(this, '#favoritesLine, .favorites');
+        })
+        .on('mouseleave', function(){
+
+        	onMouseLeave(this);
+        });
+
+
+        tweetsKey
+        .append('circle')
+		.style('fill', function(){ return color(2); })
+        .attr('r', 5)
+        .attr('x', 0)
+        .attr('y', 0);
+
+        tweetsKey
+        .append('text')
+        .attr('x', 10)
+        .attr('y', 5)
+        .style("font-weight", '400')
+        .style('fill', 'black')
+        .text('Tweets');
+
+        retweetsKey
+        .append('circle')
+		.style('fill', function(){ return color(4); })
+        .attr('r', 5)
+        .attr('x', 0)
+        .attr('y', 0);
+
+        retweetsKey
+        .append('text')
+        .attr('x', 10)
+        .attr('y', 5)
+        .style('fill', 'black')
+        .text('Retweets');
+
+        favoritesKey
+        .append('circle')
+		.style('fill', function(){ return color(6); })
+        .attr('r', 5)
+        .attr('x', 0)
+        .attr('y', 0);
+
+        favoritesKey
+        .append('text')
+        .attr('x', 10)
+        .attr('y', 5)
+        .style('fill', 'black')
+        .text('Favorites');
+	}
+
+
+})(window, d3);	
+
+	
+</script>
+<script src="../dist/js/prism.js" type="text/JavaScript"></script>
+
+</body>
+
+</html>

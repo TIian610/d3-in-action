@@ -1,0 +1,435 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> 
+
+<html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>D3 in Action</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+		<link rel="icon"  type="image/png" href="../favicon.png" />        
+		<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+        <link href="../dist/css/normalize.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/skeleton.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/prism.css" rel="stylesheet" type="text/css">
+
+        <link rel="stylesheet" href="../dist/css/app.css" rel="stylesheet" type="text/css">
+        
+        
+
+        
+</head>
+
+
+
+	<style rel="stylesheet" type="text/css">
+		line {
+ 			shape-rendering: crispEdges;
+			stroke: #000;
+		}
+		line.minor  {
+  			stroke: #777777;
+  			stroke-dasharray: 2,2;
+		}
+		path.domain {
+  			fill: none;
+  			stroke: black;
+		}
+		text {
+			font-family: sans-serif;
+			font-size: 14px;
+		}
+
+		.tick text {
+			font-family: sans-serif;
+			font-size: 11px;
+		}
+		circle {
+			pointer-events: all;
+			-moz-transition: all 0.3s;
+			-webkit-transition: all 0.3s;
+			-o-transition: all 0.3s;
+			transition: all 0.3s;
+		}
+
+		#yAxisGGrid text{
+			display: none;
+		}
+		#yAxisGGrid line{
+			stroke-dasharray: 1;
+			stroke: #bdbdbd;
+		}
+
+
+	</style>
+
+<body>
+
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+		    
+		    <h1><a href="../index.html" media="all" accesskey="0" title="D3 in action">D3 in action</a></h1>
+		    <p>Elijah Meeks</p>
+		    <p>Manning 2015</p>
+	    </div>
+	  </div>
+	</div>
+
+
+
+<article>
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+			<h3 id="data">4.5 Complex accessor functions: Stacked areas</h3>
+				<div id="viz">
+				</div>
+		    <pre><code class="language-js">
+
+// movies.csv
+day,movie1,movie2,movie3,movie4,movie5,movie6
+1,20,8,3,0,0,0
+2,18,5,1,13,0,0
+3,14,3,1,10,0,0
+4,7,3,0,5,27,15
+5,4,3,0,2,20,14
+6,3,1,0,0,10,13
+7,2,0,0,0,8,12
+8,0,0,0,0,6,11
+9,0,0,0,0,3,9
+10,0,0,0,0,1,8			</code></pre>
+
+			<p class="caption">Figure 4.24 Our stacked area code represents a movie by drawing an area, where the bottom of that area equals the total amount of money made by any movies drawn earlier for that day.</p>
+
+
+
+
+	    </div>
+	  </div>
+	</div>
+		
+		
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+
+			<pre><code class="language-markup"> <script type="prism-html-markup">
+<div id="viz">
+</div>
+</script>			    
+			</code></pre>
+	
+			<pre><code class="language-js">
+// You should use d3.area() when you want to draw a shape where the bottom of the shape can be calculated based on the top of the shape as you’re drawing it. 
+// It’s suitable for drawing bands of data, such as that found in a stacked area chart or streamgraph.
+
+var h = 540,
+	w = 500;
+var margin = {top: 40, right: 30, bottom: 20, left: 10};
+var width =  w - margin.left - margin.right,
+	height = h - margin.top -  margin.bottom;
+
+// This function takes the incoming bound data and the name of 
+// the attribute and loops through the incoming data, 
+// adding each value until it reaches the current named attribute. 
+// As a result, it returns the total value for every movie during
+//  this day up to the movie we’ve sent.
+function simpleStacking(incomingData, incomingAttribute) {
+	
+	var newHeight = 0;
+	for (x in incomingData) {
+
+	    if (x != "day") {
+
+	      newHeight += parseInt(incomingData[x]);
+	      
+	      if (x == incomingAttribute) {
+	        break;
+
+	      }
+
+    	}
+
+  	}
+	return newHeight;
+}
+function areaChart(data) {
+	console.log(data);
+	// Max-min values
+	var xMax = d3.max(data, function(d){ return + d.day});
+	var xMin = d3.min(data, function(d){ return + d.day});
+	var addxMax = xMax + .5;
+	// var yExtent = d3.extent(data, function(d) {return d.friends});
+
+	// Escales
+	var xScale = d3.scaleLinear().domain([xMin, addxMax]).range([0,width]);
+	// Scale is inverted, so higher values are drawn higher up and lower values toward the bottom
+	var yScale = d3.scaleLinear().domain([0,70]).range([h-margin.top-margin.bottom, 0]);
+	
+
+	// Axis
+	var yAxis = d3.axisRight(yScale).tickSize(width).tickPadding(5);
+	var yAxisGrid = d3.axisRight(yScale)
+		.tickSize(width)
+		.ticks(70, "f")
+		.tickPadding(5);
+	// A negative tickSize draws the lines above the axis, but we 
+	// need to make sure to offset the axis by the same value.
+	var xAxis = d3.axisBottom(xScale).tickSize(- height).tickPadding(5);
+
+
+	// Creates a color ramp that corresponds to the 10 different movies
+	var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+	var mySVG = d3.select("#viz")
+	.append("svg")
+	.attr("width", w)
+	.attr("height", h)
+	.attr("preserveAspectRatio", "xMinYMin meet")
+	.attr("viewBox", "0 0 500 500")
+	.append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	mySVG.append("g")
+		.attr("id", "yAxisGGrid")
+		.call(yAxisGrid);
+
+	mySVG.append("g")
+	.attr("id", "xAxisG")
+	.call(xAxis);
+
+	d3.selectAll("#xAxisG")
+	.attr("transform","translate(0," + height + ")");
+
+
+	mySVG.append("g").attr("id", "yAxisG").call(yAxis);
+
+
+	//for: The callback function to draw movies.csv as a line chart
+	// Iterates through our data attributes with a for loop, 
+	// where x is the name of each column from our data ("day", "movie1", "movie2", and so on), 
+	// which allows us to dynamically create and call generators
+
+	var movieArea = -1;
+	for (x in data[0]) {
+
+	    if (x !== "day") {
+	    	// Instantiates a line generator for each movie
+		    movieArea = d3.area() 
+			    .curve(d3.curveMonotoneX)
+			    // Every line uses the day column for its x value.
+			    // If x is specified, sets the x1 accessor to the specified function or number and returns this area generator.
+			    .x(function(d) {
+			        return xScale(d.day); 
+			    })
+			    // Dynamically sets the y-accessor function of our line 
+			    // generator to grab the data from the appropriate movie for our y variable.
+			   	// If y is specified, sets y0 to y and y1 to null and returns this area generator. If y is not specified, returns the current y0 accessor.
+			    .y0(function(d) {
+			        return yScale(simpleStacking(d,x)); 
+			    })
+			    // This new accessor provides us with the ability to define where the bottom of the path is. 
+			    // In this case, we start by making the bottom equal to the inverse of the top, which mirrors the shape.
+			    // If y0 is specified, sets the y1 accessor to the specified function or number and returns this area generator. If y0 is not specified, returns the current y1 accessor
+			    .y1(function(d) {
+    				return yScale(simpleStacking(d,x) - d[x]);
+				})
+		        
+		    // Draws a path using the current constructor. 
+		    // We’ll have one for each attribute not named "day". 
+		    // Give it a unique ID based on which attribute we’re drawing an area for. 
+		    // Fill the area with a color based on the color ramp we built.
+		    mySVG
+		        .append("path")
+		        .attr("id", x + "Area")
+		        .attr("d", movieArea(data))
+		        .attr("fill", function(){ return color(x); })
+		        .style('stroke', function(){ return color(x); })
+		        .style('stroke-opacity', .5)
+		        .attr("stroke-width", 1)
+		        .style("opacity", .5);
+	        
+	    }
+	}		
+}
+
+d3.csv("../data/movies.csv", areaChart);
+
+
+			</code></pre>
+
+	    </div>
+	  </div>
+	</div>
+	
+	
+</article>
+
+
+<script src="../dist/js/vendors/d3.min.js" type="text/javaScript"></script>
+
+<!-- http://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3 -->
+<script src="../dist/js/colorbrewer.js" type="text/javascript"></script>
+
+<script>
+	
+// http://bl.ocks.org/mbostock/1166403
+
+(function(scope, d3) {
+
+	// You should use d3.area() when you want to draw a shape where the bottom of the shape can be calculated based on the top of the shape as you’re drawing it. 
+	// It’s suitable for drawing bands of data, such as that found in a stacked area chart or streamgraph.
+
+	var h = 540,
+		w = 500;
+	var margin = {top: 40, right: 30, bottom: 20, left: 10};
+	var width =  w - margin.left - margin.right,
+    	height = h - margin.top -  margin.bottom;
+	
+	// This function takes the incoming bound data and the name of 
+	// the attribute and loops through the incoming data, 
+	// adding each value until it reaches the current named attribute. 
+	// As a result, it returns the total value for every movie during
+	//  this day up to the movie we’ve sent.
+	function simpleStacking(incomingData, incomingAttribute) {
+
+		var newHeight = 0;
+		for (x in incomingData) {
+
+		    if (x != "day") {
+
+		      newHeight += parseInt(incomingData[x]);
+		      
+		      if (x == incomingAttribute) {
+		        break;
+
+		      }
+
+	    	}
+
+	  	}
+		return newHeight;
+	}
+    function areaChart(data) {
+		console.log(data);
+		// Max-min values
+		var xMax = d3.max(data, function(d){ return + d.day});
+		var xMin = d3.min(data, function(d){ return + d.day});
+		var addxMax = xMax + .5;
+		// var yExtent = d3.extent(data, function(d) {return d.friends});
+
+		// Escales
+		var xScale = d3.scaleLinear().domain([xMin, addxMax]).range([0,width]);
+		// Scale is inverted, so higher values are drawn higher up and lower values toward the bottom
+    	var yScale = d3.scaleLinear().domain([0,70]).range([h-margin.top-margin.bottom, 0]);
+		
+
+		// Axis
+		var yAxis = d3.axisRight(yScale).tickSize(width).tickPadding(5);
+		var yAxisGrid = d3.axisRight(yScale)
+			.tickSize(width)
+			.ticks(70, "f")
+			.tickPadding(5);
+		// A negative tickSize draws the lines above the axis, but we 
+		// need to make sure to offset the axis by the same value.
+		var xAxis = d3.axisBottom(xScale).tickSize(- height).tickPadding(5);
+
+
+		// Creates a color ramp that corresponds to the 10 different movies
+		var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+		var mySVG = d3.select("#viz")
+		.append("svg")
+    	.attr("width", w)
+    	.attr("height", h)
+    	.attr("preserveAspectRatio", "xMinYMin meet")
+    	.attr("viewBox", "0 0 500 500")
+  		.append("g")
+    	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+		mySVG.append("g")
+			.attr("id", "yAxisGGrid")
+			.call(yAxisGrid);
+
+    	mySVG.append("g")
+		.attr("id", "xAxisG")
+		.call(xAxis);
+
+		d3.selectAll("#xAxisG")
+		.attr("transform","translate(0," + height + ")");
+
+
+		mySVG.append("g").attr("id", "yAxisG").call(yAxis);
+
+
+		//for: The callback function to draw movies.csv as a line chart
+		// Iterates through our data attributes with a for loop, 
+		// where x is the name of each column from our data ("day", "movie1", "movie2", and so on), 
+		// which allows us to dynamically create and call generators
+
+		var movieArea = -1;
+		for (x in data[0]) {
+
+		    if (x !== "day") {
+		    	// Instantiates a line generator for each movie
+			    movieArea = d3.area() 
+				    .curve(d3.curveMonotoneX)
+				    // Every line uses the day column for its x value.
+				    // If x is specified, sets the x1 accessor to the specified function or number and returns this area generator.
+				    .x(function(d) {
+				        return xScale(d.day); 
+				    })
+				    // Dynamically sets the y-accessor function of our line 
+				    // generator to grab the data from the appropriate movie for our y variable.
+				   	// If y is specified, sets y0 to y and y1 to null and returns this area generator. If y is not specified, returns the current y0 accessor.
+				    .y0(function(d) {
+				        return yScale(simpleStacking(d,x)); 
+				    })
+				    // This new accessor provides us with the ability to define where the bottom of the path is. 
+				    // In this case, we start by making the bottom equal to the inverse of the top, which mirrors the shape.
+				    // If y0 is specified, sets the y1 accessor to the specified function or number and returns this area generator. If y0 is not specified, returns the current y1 accessor
+				    .y1(function(d) {
+        				return yScale(simpleStacking(d,x) - d[x]);
+    				})
+			        
+			    // Draws a path using the current constructor. 
+			    // We’ll have one for each attribute not named "day". 
+			    // Give it a unique ID based on which attribute we’re drawing an area for. 
+			    // Fill the area with a color based on the color ramp we built.
+			    mySVG
+			        .append("path")
+			        .attr("id", x + "Area")
+			        .attr("d", movieArea(data))
+			        .attr("fill", function(){ return color(x); })
+			        .style('stroke', function(){ return color(x); })
+			        .style('stroke-opacity', .5)
+			        .attr("stroke-width", 1)
+			        .style("opacity", .5);
+		        
+		    }
+		}		
+	}
+
+	d3.csv("../data/movies.csv", areaChart);
+
+
+})(window, d3);	
+
+	
+</script>
+<script src="../dist/js/prism.js" type="text/javaScript"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,606 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> 
+
+<html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>D3 in Action</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+		<link rel="icon"  type="image/png" href="favicon.png" />        
+		<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+        <link href="./dist/css/normalize.css" rel="stylesheet" type="text/css">
+        <link href="./dist/css/skeleton.css" rel="stylesheet" type="text/css">
+        <link href="./dist/css/app.css" rel="stylesheet" type="text/css">
+        
+</head>
+
+
+
+<style rel="stylesheet" type="text/css">
+div > ul:first-child > li{
+	margin-top: 200px
+}
+div > ul:first-child > li:first-child{
+	margin-top: 0
+}
+
+</style>
+
+<body>
+
+
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+		    
+		    
+		    <h1>D3 in action</h1>
+		    <p>Elijah Meeks</p>
+		    <p>Manning 2015</p>
+	    </div>
+	  </div>
+	</div>
+	
+	
+
+<article>
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+		    
+		    <ul>
+
+		    	<li><h1>PART 1: D3.JS FUNDAMENTALS</h1>
+				    <ul>
+					    <li><h2>1. An Introduction to D3.js</h2>
+					    
+						    <ul>
+							    <li><h3>1.1 What is D3.js?</h3></li>
+							    <li><h3>1.2. How D3 works</h3></li>
+								<li><h3>1.3 Using HTML5</h3>
+								
+								    <ul>
+									    <li><h4>1.3.1 The DOM</h4>
+										    <ul>
+											    <li><p><a href="./files/Fig_01_17.html#Listing1.1" media="all" title="A simple web page demonstrating the DOM" target="_blank">Listing 1.1 A simple web page demonstrating the DOM</a></p></li>
+											    <li></li>
+											    <li></li>
+										    </ul>
+									    </li>
+									    <li><h4>1.3.2 Coding in the console</h4></li>
+									    <li><h4>1.3.3 SVG</h4>
+									    	
+									    	<ul>
+											    <li><p><a href="./files/Fig_01_17.html#Listing1.2" media="all" title="A sample web page with SVG elements" target="_blank">Listing 1.2 A sample web page with SVG elements</a></p></li>
+											    
+											    <li><p><a href="./files/Fig_01_17.html#Listing1.4" media="all" title="SVG path fill and closing" target="_blank">Listing 1.4 SVG path fill and closing</a></p></li>
+									    	</ul>
+									    </li>
+									    
+									    <li><h4>1.3.4 CSS</h4>
+									    	<ul>
+											    <li><p><a href="./files/Fig_01_17.html#Listing1.5" media="all" title="A sample web page with a style sheet" target="_blank">Listing 1.5 A sample web page with a style sheet</a></p></li>
+									    	</ul>
+									    </li>
+
+									    <li><h4>1.3.5 Javascript</h4>
+									    	<ul>
+											    <li><p><a href="./files/Fig_01_26.html#Fig_01_26" media="all" title="Method Chaining" target="_blank">Method Chaining</a></p></li>
+											    <li><p><a href="./files/Fig_01_26.html#Fig_01_27" media="all" title="Arrays and Array Function" target="_blank">Arrays and Array Function</a></p></li>
+									    	</ul>
+									    </li>
+								    </ul>
+								</li>
+
+								<li><h3>1.4 Data standards</h3>
+								
+								    <ul>
+									    <li><h4>1.4.1 Tabular data</h4>
+										    <ul>
+											    <li><p>d3.csv()</p></li>
+											    <li><p>d3.tsv()</p></li>
+											    <li><p>d3.dsv()</p></li>
+										    </ul>
+									    </li>
+
+									    <li><h4>1.4.2 Nested data</h4></li>
+									    <li><h4>1.4.3 Network data</h4></li>
+									    <li><h4>1.4.4 Geographic data</h4></li>
+									    <li><h4>1.4.5 Raw data</h4></li>
+									    <li><h4>1.4.6 Objects</h4>
+										    <ul>
+											    <li><p>d3.select()</p></li>
+											    <li><p>for (x in person){}</p></li>
+											    <li><p>d3.json()</p></li>
+										    </ul>
+									    </li>
+								    </ul>
+								</li>
+
+								<li><h3>1.5 Infoviz standards expressed in D3</h3>
+									
+									<ul>
+									    <li><p>The Visual Display of Quantitative Information Envisioning Information, Edward Tufte</p></li>
+									    <li><p>Designing for Information, Isabel Meirelles</p></li>
+								    	<li><p>Pattern Recognition, Christian Swinehart</p></li>
+									
+									</ul>
+
+
+								</li>
+
+								<li><h3>1.6 Your first D3 app</h3>						
+									
+									<ul>
+
+										<li><h4>1.6.1 Hello world with divs</h4>
+										    <ul>							    	
+										    	<li><p><a href="./files/Fig_01_32.html#Listing1.7" media="all" title="Hello world with divs" target="_blank">Listing 1.7 Using d3.select to set style and HTML content</a></p></li>
+
+								    		</ul>
+										</li>
+
+										<li><h4>1.6.2 Hello world with circles</h4>
+										    <ul>							    	
+										    	<li><p><a href="./files/Fig_01_32.html#Listing1.9" media="all" title="A simple web page with an SVG canvas" target="_blank">Listing 1.10 A simple web page with an SVG canvas</a></p></li>
+								    		</ul>
+										</li>
+
+										<li><h4>1.6.3 A conversation with D3</h4>
+										    <ul>							    	
+										    	<li><p><a href="./files/Fig_01_32.html#Listing1.11" media="all" title="SVG elements with IDs and transparency" target="_blank">Listing 1.11 SVG elements with IDs and transparency</a></p></li>
+										    	
+								    		</ul>
+										</li>
+									</ul>	
+
+
+
+								</li>
+
+			
+						    </ul>
+
+						</li>
+
+
+					    <li>
+							<h2>2. Information visualization data flow</h2>
+
+								<ul>
+									<li><h3>2.1 Working with data</h3>
+
+										<ul>
+											<li><h4>2.1.1 Loading data</h4>
+
+												<ul>
+											    	<li><p>d3.csv()</p></li>
+											    	
+										    		<li><p>d3.json()</p></li>
+									    			<li><p>.parse()</p></li>
+									    			<li><p>d3.xhr()</p></li>
+									    		</ul>
+
+											</li>
+											<li><h4>2.1.2 Formatting data</h4>
+
+												<ul>
+											    	<li><p>Quantitative: d3.scaleLinear()</p>
+														<ul>
+												    		<li><p>Bonus_2.1.2.1: <a href="./files/bonus_2.1.2.1.html" media="all" title="scaleLinear function" target="_blank">scaleLinear function</a></p></li>
+											    		</ul>
+
+											    	</li>
+										    		<li><p>Categorical: Text</p></li>
+									    			<li><p>Topological: Networks</p></li>
+									    			<li><p>Geometric: Geographic data</p></li>
+									    			<li><p>Temporal: Dates and time</p></li>
+									    			<li><p>Raw: Unstructured data</p></li>
+									    		</ul>
+
+
+											</li>
+											<li><h4>2.1.3 Transforming data</h4>
+
+												<ul>
+											    	<li><p>Casting: Changing Datatype</p></li>
+										    		<li><p>Scales and Scaling: d3.scale(), d3.domain(), d3.range(), d3.time.scale()</p></li>
+									    			<li><p>Binning: Categorizing data | d3.scale.quantile()</p></li>
+									    			<li><p>Nesting: d3.nest().key()</p></li>
+									    		</ul>
+
+
+
+
+											</li>
+
+											<li><h4>2.1.4 Measuring data</h4>
+												<ul>
+											    	<li><p>d3.min()</p></li>
+										    		<li><p>d3.max()</p></li>
+									    			<li><p>d3.mean()</p></li>
+									    			<li><p>d3.extent()</p></li>
+									    		</ul>
+
+											</li>
+
+										</ul>
+
+									</li>
+
+									<li><h3>2.2 Data binding</h3>
+
+										<ul>
+											<li><h4>2.2.1 Selection and binding</h4>
+
+												<ul>
+											    	<li><p><a href="./files/Fig_02_11.html#figure2.11" media="all" title="Selections and binding" target="_blank">Figure 2.11 Selection and binding </a></p></li>
+									    		</ul>
+
+
+											</li>
+											<li><h4>2.2.2 Accesing data with inline functions</h4>
+												<ul>
+										    		<li><p><a href="./files/Fig_02_11.html#figure2.12" media="all" title="Accessing data with inline functions" target="_blank">Figure 2.17 Accessing data with inline functions</a></p></li>
+									    		</ul>
+
+											</li>
+											<li><h4>2.2.3 Integration scales</h4>
+												<ul>
+										    		<li><p>Bonus_2.2.3: <a href="./files/bonus_2.2.3.html" media="all" title="Integration scales" target="_blank">Your First Animated D3 Chart</a></p></li>
+									    		</ul>
+											</li>
+
+										</ul>
+
+									</li>
+									<li><h3>2.3 Data presentation style, attributes and content</h3>
+
+										<ul>
+											<li><h4>2.3.1 Visualization and binding</h4>
+												<ul>
+										    		<li><p><a href="./files/Fig_02_21.html#figure2.21" media="all" title="Visualization from loaded data" target="_blank">Figure 2.21 Visualization from loaded data</a></p></li>
+									    		</ul>
+
+
+											</li>
+											<li><h4>2.3.2 Setting channels</h4>
+
+												<ul>
+										    		<li><p><a href="./files/Fig_02_21.html#figure2.22" media="all" title="Loading, nesting, measuring, and representing data" target="_blank">Figure 2.22 Loading, nesting, measuring, and representing data</a></p></li>
+
+										    		<li><p><a href="./files/Fig_02_21.html#figure2.23" media="all" title="Creating a scatterplot" target="_blank">Figure 2.23 Creating a scatterplot</a></p></li>
+
+
+									    		</ul>
+
+
+											</li>	
+											<li><h4>2.3.3 Enter, update and exit</h4>
+												<ul>
+										    		<li><p><a href="./files/Fig_02_25.html" media="all" title="Enter, update and exit" target="_blank">Figure 2.25 Creating labels on &lt;g&gt; elements</a></p></li>
+
+										    		<li><p><a href="./files/Fig_02_27.html" media="all" title="Enter, update and exit" target="_blank">Figure 2.27 Setting the key value in data-binding</a></p></li>
+
+												</ul>
+
+											</li>
+
+										</ul>
+
+									</li>
+
+
+								</ul>
+					    </li>
+
+
+					    <li>
+							<h2>3. Data-driven design and interaction</h2>
+
+								<ul>
+									<li><h3>3.1 Project architecture</h3>
+
+										<ul>
+											<li><h4>3.1.1 Data</h4></li>
+											<li><h4>3.1.2 Resources</h4></li>
+											<li><h4>3.1.3 Images</h4></li>
+											<li><h4>3.1.4 Style Sheets</h4></li>
+											<li><h4>3.1.5 External Libraries</h4>
+												<ul>
+										    		<li><p><a href="./files/Fig_03_02.html#figure3.02" media="all" title="Enter, update and exit" target="_blank">Figure 3.2 Circles and labels created from a CSV representing 2010 World Cup Statistics</a></p></li>
+
+
+												</ul>
+
+
+
+
+
+											</li>
+										</ul>
+
+									</li>
+
+									<li><h3>3.2 Interactive style and DOM</h3>
+
+										<ul>
+											<li><h4>3.2.1 Events</h4>
+												<ul>
+										    		<li><p><a href="./files/Fig_03_03.html" media="all" title="Enter, update and exit" target="_blank">Figure 3.3 Buttons for each numerical attribute are appended to the controls div behind the viz div.</a></p></li>
+												</ul>
+											</li>
+											<li><h4>3.2.2 Graphical transitions</h4>
+												<ul>
+										    		<li><p><a href="./files/Fig_03_07.html" media="all" title="Graphical transitions" target="_blank">Figure 3.5 The effect of our initial highlightRegion selects elements with the same region attribute and colors them red, while coloring gray those that aren’t in the same region.</a></p></li>
+
+
+										    		<li><p>Bonus_3.2.2: <a href="./files/bonus_3.2.2.html" media="all" title="Moving and Rotating Objects" target="_blank">Moving and Rotating Objects</a></p></li>
+
+												</ul>
+											</li>
+											<li><h4>3.2.3 DOM manipulation</h4>
+
+												<ul>
+										    		<li><p><a href="./files/Fig_03_09.html" media="all" title="DOM manipulation" target="_blank">Figure 3.10 Re-appending the &lt;g&gt; element for Germany to the &lt;svg&gt;element moves it to the end of that DOM region and therefore it’s drawn above the other &lt;g&gt; elements.</a></p></li>
+												</ul>
+
+
+
+											</li>
+											<li><h4>3.2.4 Using color wisely</h4>
+
+												<ul>
+
+													<li><p>Color Mixing: <a href="./files/Fig_03_14.html" media="all" title="Color mixing" target="_blank">Figure 3.11 Using the darker and brighter functions of a d3.rgb object in the highlighting function produces a darker version of the set color for teams from the same region and lighter colors for teams from different regions.</a></p>
+													</li>
+													<li><p>Discrete colors</p></li>
+													<li><p>Color ramps for numerical data: <a href="./files/Fig_03_17.html" media="all" title="Color ramps for numerical data" target="_blank">Figure 3.17 Automatic quantizing linked with the ColorBrewer 3-red scale produces distinct visual categories in the red family.</a></p></li>
+												</ul>
+											</li>
+										</ul>
+
+									</li>
+									<li><h3>3.3 Pregenerated content</h3>
+
+										<ul>
+											<li><h4>3.3.1 Images</h4>
+												<ul>
+													<li><p><a href="./files/Fig_03_19.html#images" media="all" title="images" target="_blank">Figure 3.18 Our graphical representations of each team now include a small PNG national flag, downloaded from Wikipedia and loaded using an SVG &lt;image&gt; element.</a></p>
+													</li>
+												</ul>
+											</li>
+
+											<li><h4>3.3.2 HTML fragments</h4>
+												<ul>
+													<li><p><a href="./files/Fig_03_19.html#html" media="all" title="HTML fragments" target="_blank">Figure 3.19 The modal dialog is styled based on the defined style in CSS. It’s created by loading the HTML data from modal.html and adding it to the content of a newly created div</a></p>
+													</li>
+												</ul>
+											</li>	
+											<li><h4>3.3.3 Pregenerated SVG</h4>
+												<ul>
+													<li><p><a href="./files/Fig_03_24.html" media="all" title="Pregenerated SVG" target="_blank">Figure 3.25 The paths now have the data from their parent element bound to them and respond accordingly when a discrete color scale based on region is applied.</a></p>
+													</li>
+												</ul>
+											</li>
+										</ul>
+									</li>
+								</ul>
+					    </li>
+				    </ul>
+		    	</li>
+
+
+			    <li><h1>PART 2: THE PILLARS OF INFORMATION VISUALIZATION</h1>
+
+				    <ul>
+					    <li>
+							<h2>4. Chart components</h2>
+
+								<ul>
+									<li><h3>4.1 General charting principles</h3>
+
+										<ul>
+											<li><h4>4.1.1 Generators: area(), line(), diagonal(), arc()</h4>
+												<ul>
+										    		<li><p>Bonus_4.1.1.1: <a href="./files/bonus_4.1.1.1.html" media="all" title="Introducing D3 Path Generators" target="_blank">Introducing D3 Path Generators</a></p></li>
+
+
+										    		<li><p>Bonus_4.1.1.2: This and <a href="./files/bonus_4.1.1.2.html" media="all" title="Using Area Charts" target="_blank">Using Area Charts</a></p></li>
+
+										    		<li><p>Bonus_4.1.1.3: Using Arcs: <a href="./files/bonus_4.1.1.3.html" media="all" title="Bending bars into arcs" target="_blank">Bending bars into arcs</a></p></li>
+
+
+									    		</ul>
+											</li>
+											<li><h4>4.1.2 Components: axis(), brush(), zoom()</h4>
+
+											</li>
+											<li><h4>4.1.3 Layouts: stack(), pie(), chord()</h4>
+												<ul>
+										    		<li><p>Bonus_4.1.3.1: <a href="./files/bonus_4.1.3.1.html" media="all" title="Pie Chart Layout" target="_blank">Pie Chart Layout</a></p></li>
+										    		<li><p>Bonus_4.1.3.2: <a href="./files/bonus_4.1.3.2.html" media="all" title="Treemaps" target="_blank">Treemaps</a></p></li>
+										    		<li><p>Bonus_4.1.3.3: <a href="./files/bonus_4.1.3.3.html" media="all" title="Stacked Bar Chart" target="_blank">Stacked Bar Chart</a></p></li>
+
+									    		</ul>
+											</li>
+
+										</ul>
+
+									</li>
+
+									<li><h3>4.2 Creating an axis</h3>
+
+										<ul>
+											<li><h4>4.2.1 Plotting Data</h4>
+												<ul>
+													<li><p><a href="./files/Fig_04_05.html#data" media="all" title="Plotting Data" target="_blank">Figure 4.5 The same scatterplot from figure 4.4, but with a pair of labeled axes. The x-axis is drawn in such a way as to obscure one of the points.</a></p>
+													</li>
+												</ul>
+											</li>
+											<li><h4>4.2.2 Styling Axes</h4>
+												<ul>
+													<li><p><a href="./files/Fig_04_05.html#axes" media="all" title="Plotting Data" target="_blank">Figure 4.9 With &lt;path.domain&gt; fill set to "none" and CSS settings also corresponding to the tick &lt;line&gt; elements, we can draw a rather attractive grid based on our two axes.</a></p>
+													</li>
+												</ul>
+											</li>
+
+										</ul>
+
+									</li>
+									<li><h3>4.3 Complex graphical objects</h3>
+												<ul>
+													<li><p><a href="./files/Fig_04_14.html" media="all" title="Complex graphical objects" target="_blank">Figure 4.16 Our final boxplot chart. Each day now shows not only the median age of visitors but also the range of visiting ages, allowing for a more extensive examination of the demographics of site visitorship.</a></p>
+													</li>
+												</ul>
+									</li>
+									<li><h3>4.4 Line charts and interpolations</h3>
+
+										<ul>
+											<li><h4>4.4.1 Drawing a line from points</h4>
+
+												<ul>
+										    		<li><p>Bonus_4.4.1: <a href="./files/bonus_4.4.1.html" media="all" title="Connecting the Dots with SVG Diagonal" target="_blank">Connecting the Dots with SVG Diagonal</a></p></li>
+									    		</ul>
+
+
+
+											</li>
+											<li><h4>4.4.2 Drawing many lines with multiple generator</h4>
+												<ul>
+													<li><p><a href="./files/Fig_04_19.html" media="all" title="Drawing many lines with multiple generators" target="_blank">Figure 4.19 The dataset is first used to draw a set of circles, which creates the scatterplot from the beginning of this section. The dataset is then used three more times to draw each line.</a></p>
+													</li>
+												</ul>
+											</li>
+											<li><h4>4.4.3 Exploring line interpolators: line() and curve()</h4>
+												<ul>
+													<li><p><a href="./files/Fig_04_20.html" media="all" title="Exploring line interpolators" target="_blank">Figure 4.20 Orange: “curveStepBefore” interpolation; Red: 'curveMonotoneX' interpolation; Green: 'curveCatmullRom'.</a></p>
+												</ul>
+											</li>
+
+										</ul>
+
+									</li>
+									<li><h3>4.5 Complex accesor functions</h3>
+												<ul>
+													<li><p>Listing 4.12 The callback function to draw movies.csv as a line chart: <a href="./files/Fig_04_22.html" media="all" title="Complex accesor functions" target="_blank">Figure 4.22 Each movie column is drawn as a separate line.</a></p>
+
+													<li><p>Listing 4.13 Area accessors: <a href="./files/Fig_04_23.html" media="all" title="Complex accesor functions" target="_blank">Figure 4.23 By using an area generator and defining the bottom of the area as the inverse of the top, we can mirror our lines to create an area chart. Here they’re drawn with semitransparent fills, so that we can see how they overlap.</a></p>
+
+
+													<li><p>Listing 4.14 Callback function for drawing stacked areas: <a href="./files/Fig_04_24.html" media="all" title="Complex accesor functions" target="_blank">Figure 4.24 Our stacked area code represents a movie by drawing an area, where the bottom of that area equals the total amount of money made by any movies drawn earlier for that day.</a></p>
+
+
+
+												</ul>
+									</li>
+								</ul>
+					    </li>
+
+					    <li>
+							<h2>5. Layouts</h2>
+
+								<ul>
+									<li><h3>5.1 Histograms</h3>
+
+									</li>
+
+									<li><h3>5.2 Pie Charts</h3>
+
+										<ul>
+											<li><h4>5.2.1 Drawing the pie layout</h4>
+
+											</li>
+											<li><h4>5.2.2 Creating a ring chart</h4>
+
+											</li>
+											<li><h4>5.2.3 Transitioning</h4>
+
+											</li>
+
+										</ul>
+
+									</li>
+									<li><h3>5.3 Pack layouts</h3>
+										<ul>
+											<li><p>Bonus_5.3.1: <a href="./files/Bonus_5.3.1.html" media="all" title="Pack Layout" target="_blank">Pack Layout</a></p></li>
+											<li><p>Bonus_5.3.2: <a href="./files/Bonus_5.3.2.html" media="all" title="Partition Layout" target="_blank">Partition Layout</a></p></li>
+
+									    </ul>
+
+									</li>
+									<li><h3>5.4 Trees</h3>
+									</li>
+									<li><h3>5.5 Stack Layout</h3>
+									</li>
+									<li><h3>5.6 Plugings to add new layouts</h3>
+										<ul>
+											<li><h4>5.6.1 Sankey diagram</h4>
+
+											</li>
+											<li><h4>5.6.2 Word clouds</h4>
+
+											</li>
+
+										</ul>
+
+
+
+									</li>
+
+
+								</ul>
+					    </li>
+
+					    <li></li>
+				    </ul>
+
+
+
+			    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		    </ul>	
+
+		    
+		    
+		    
+		    
+		        
+	
+		    <p>Manning 2015</p>
+	    </div>
+	  </div>
+	</div>
+</article>
+
+<script>
+console.log("ich");
+
+</script>
+</body>
+
+</html>

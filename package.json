@@ -1,0 +1,44 @@
+{
+  "name": "d3-in-action",
+  "version": "1.0.0",
+  "description": "D3 in action, Elijah Meeks",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Juantxo/d3-in-action.git"
+  },
+  "keywords": [
+    "d3",
+    "javascript",
+    "js",
+    "manning",
+    "visualization"
+  ],
+  "author": "Juantxo Cruz <jcruz16@gmail.com> (http://www.prodigiosovolcan.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Juantxo/d3-in-action/issues"
+  },
+  "homepage": "https://github.com/Juantxo/d3-in-action#readme",
+  "devDependencies": {
+    "babel-preset-es2015": "^6.13.2",
+    "browser-sync": "^2.14.0",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.0",
+    "gulp-babel": "^6.1.2",
+    "gulp-concat": "^2.6.0",
+    "gulp-jshint": "^2.0.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^2.3.2",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-uglify": "^2.0.0",
+    "jshint": "^2.9.2",
+    "sassdoc": "^2.1.20"
+  },
+  "engines": {
+    "node": ">= 0.4.0"
+  }
+}

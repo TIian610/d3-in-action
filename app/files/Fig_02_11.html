@@ -1,0 +1,245 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> 
+
+<html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>D3 in Action</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+		<link rel="icon"  type="image/png" href="../favicon.png" />        
+		<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+        <link href="../dist/css/normalize.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/skeleton.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/prism.css" rel="stylesheet" type="text/css">
+
+        <link rel="stylesheet" href="../dist/css/app.css" rel="stylesheet" type="text/css">
+        
+        
+
+        
+</head>
+
+
+
+	<style rel="stylesheet" type="text/css">
+
+		svg {
+
+			width: 100%;
+			height: 500px;
+			border: 1px lightgray solid;
+			background-color: #ffffff;
+		}
+
+	</style>
+
+<body>
+
+
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+		    
+		    <h1><a href="../index.html" media="all" accesskey="0" title="D3 in action">D3 in action</a></h1>
+		    <p>Elijah Meeks</p>
+		    <p>Manning 2015</p>
+	    </div>
+	  </div>
+	</div>
+
+
+<article>
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+			<h3 id="figure2.11">2.2.1 Selections and binding</h3>
+			
+		    <div id="d3-container-1">
+		    </div>
+			<p class="caption">Figure 2.11 When our selection binds the cities.csv data to our web page, it creates eight new divs, each of which is classed with "cities" and with content drawn from our data.</p>
+
+	    </div>
+	  </div>
+	</div>
+		
+		
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+
+
+			    <pre><code class="language-markup"> <script type="prism-html-markup">
+"label","population","country","x","y"
+"San Francisco", 750000,"USA",37,-122
+"Fresno", 500000,"USA",36,-119
+"Lahore",12500000,"Pakistan",31,74
+"Karachi",13000000,"Pakistan",24,67
+"Rome",2500000,"Italy",41,12
+"Naples",1000000,"Italy",40,14
+"Rio",12300000,"Brazil",-22,-43
+"Sao Paolo",12300000,"Brazil",-23,-46</script>			    
+				</code></pre>
+	
+			    <pre><code class="language-markup"> <script type="prism-html-markup">
+<div id="d3-container-1"></div></script>			    
+				</code></pre>
+		
+			 <pre><code class="language-js">
+const d3Container1 = d3.select('#d3-container-1');
+
+function dataViz(incomingData) {
+
+	d3Container1
+		// An empty selection because there are no &lt;div&gt; elements in &lt;body&gt; with class of “cities”
+		.selectAll("div.cities")
+		// Here you associate an array with the DOM elements you selected
+		.data(incomingData)
+		// Defines how to respond when there’s more data than DOM elements in a selection
+		// document.getElementsByClassName("cities")[0].__data__
+		// In our case, .enter() fires four times, because no DOM elements correspond to "div.cities" and our incomingData array contains eight values.
+		.enter()
+		.append("div")
+		.attr("class","cities")
+		.html(function(d,i) {return (i +1) + '. ' + d.label})
+
+}
+
+d3.csv('../data/cities.csv', function (error, data){
+
+	dataViz(data);
+
+});
+			</code></pre>
+
+	    </div>
+	  </div>
+	</div>
+	
+	
+</article>
+
+
+<article>
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+			<h3 id="figure2.12">2.2.2 Accessing data with inline functions</h3>
+			
+			<svg id='svg1' viewBox="0 0 100 100"></svg>
+			<p class="caption">Figure 2.17 A bar chart drawn using a linear scale.</p>
+
+	    </div>
+	  </div>
+	</div>
+		
+		
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+
+
+	
+			    <pre><code class="language-markup"> <script type="prism-html-markup">
+<svg id='svg1' viewBox="0 0 100 100"></svg></script>			    
+				</code></pre>
+		
+			 <pre><code class="language-js">
+var yScale = d3.scaleLinear().domain([0,24500]).range([0,100]);	
+
+d3.select("svg")
+	.selectAll("rect")
+	.data([14, 68, 24500, 430, 19, 1000, 5555])
+	.enter()
+	.append("rect")
+	.attr("width", 10)
+	.attr("height", function(d) {return yScale(d)})
+	.style("fill", "blue")
+	.style("stroke", "red")
+	.style("stroke-width", "1px")
+	.style("opacity", .25)
+	.attr("x", function(d,i) {return i * 10})
+	.attr("y", function(d) {return 100 - yScale(d)});
+			</code></pre>
+
+	    </div>
+	  </div>
+	</div>
+	
+	
+</article>
+
+
+<script src="../dist/js/vendors/d3.min.js" type="text/JavaScript"></script>
+
+<script>
+	
+
+(function(scope, d3) {
+
+	// Figure 2.11
+	const d3Container1 = d3.select('#d3-container-1');
+
+	function dataViz(incomingData) {
+
+		d3Container1
+			.selectAll("div.cities")
+			.data(incomingData)
+			.enter()
+			.append("div")
+			.attr("class","cities")
+			.html(function(d,i) {return (i +1) + '. ' + d.label})
+
+	}
+
+	d3.csv('../data/cities.csv', function (error, data){
+
+		dataViz(data);
+
+	});
+
+	// Figure 2.12
+
+	var yScale = d3.scaleLinear().domain([0,24500]).range([0,100]);	
+	// yScale(0);		// -> 0
+	// yScale(100);	// -> 0.40816326530612246
+	//	yScale(24000);	// -> 97.95918367346938
+
+	d3.select("svg#svg1")
+		.selectAll("rect")
+		.data([14, 68, 24500, 430, 19, 1000, 5555])
+		.enter()
+		.append("rect")
+		.attr("width", 10)
+		.attr("height", function(d) {return yScale(d)})
+		.style("fill", "blue")
+		.style("stroke", "red")
+		.style("stroke-width", "1px")
+		.style("opacity", .25)
+		.attr("x", function(d,i) {return i * 10})
+		.attr("y", function(d) {return 100 - yScale(d)});
+
+
+
+})(window, d3);	
+
+	
+</script>
+
+<script src="../dist/js/prism.js" type="text/JavaScript"></script>
+
+</body>
+
+</html>
