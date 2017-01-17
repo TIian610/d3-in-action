@@ -30,42 +30,28 @@
 
 
 	<style rel="stylesheet" type="text/css">
-		line {
- 			shape-rendering: crispEdges;
-			stroke: #000;
-		}
-		line.minor  {
-  			stroke: #777777;
-  			stroke-dasharray: 2,2;
-		}
-		path.domain {
-  			fill: none;
-  			stroke: black;
-		}
-		text {
-			font-family: sans-serif;
-			font-size: 14px;
+		.axis {
+		  font: 10px sans-serif;
 		}
 
-		.tick text {
-			font-family: sans-serif;
-			font-size: 11px;
-		}
-		circle {
-			pointer-events: all;
-			-moz-transition: all 0.3s;
-			-webkit-transition: all 0.3s;
-			-o-transition: all 0.3s;
-			transition: all 0.3s;
+		.axis path,
+		.axis line {
+		  fill: none;
+		  stroke: #000;
+		  shape-rendering: crispEdges;
 		}
 
-		#yAxisGGrid text{
-			display: none;
+		.x.axis path {
+		  display: none;
 		}
-		#yAxisGGrid line{
-			stroke-dasharray: 1;
-			stroke: #bdbdbd;
+		rect{
+			opacity: 0.8;
+			transition: opacity 0.5s ease;
 		}
+		rect:hover{
+			opacity: 1;
+		}
+
 
 
 	</style>
@@ -92,8 +78,21 @@
 	  <div class="row">
 	    <div class="twelve columns">
 			<h3 id="data">5.1 Histogram code</h3>
+			<p><small>Click on the chart to change data from favorites to the number of retweets.</small></p>
 				<div id="viz">
 				</div>
+
+
+			<p class="caption">Figure 5.2 The histogram in its initial state (left) and after we change the measure from favorites to retweets (right) by clicking on one of the bars.</p>
+
+			<p class="caption">FFigure 5.3 the processed data from d3.histogram returns an array where each array item also has an x0 and x1 field.</p>
+
+			<p class="caption">Figure 5.4 The histogram chart we’ve built will make an animated transition to display tweets binned by the number of retweets instead of the number of favorites.</p>
+
+
+
+
+
 		    <pre><code class="language-js">
 
 // tweets.json
@@ -113,10 +112,6 @@
 }
 
 			</code></pre>
-
-			<p class="caption">Figure 5.2 The histogram in its initial state (left) and after we change the measure from favorites to retweets (right) by clicking on one of the bars.</p>
-
-
 
 
 	    </div>
@@ -160,47 +155,47 @@
 
 (function(scope, d3) {
 
-	// You should use d3.area() when you want to draw a shape where the bottom of the shape can be calculated based on the top of the shape as you’re drawing it. 
-	// It’s suitable for drawing bands of data, such as that found in a stacked area chart or streamgraph.
+	// // set the dimensions and margins of the graph
 
 	var h = 540,
 		w = 500;
-	var margin = {top: 40, right: 30, bottom: 20, left: 10};
+	var margin = {top: 10, right: 10, bottom: 30, left: 10};
 	var width =  w - margin.left - margin.right,
     	height = h - margin.top -  margin.bottom;
 	
     function histogram(tweetsData) {
 		console.log(tweetsData);
 
-		// Escales
-		var xScale = d3.scaleLinear().domain([0,5]).range([0,width]);
+		// Escales: set the ranges
+		var xScale = d3.scaleLinear().domain([0,5]).rangeRound([0,width - margin.right]);
 		// Scale is inverted, so higher values are drawn higher up and lower values toward the bottom
-    	var yScale = d3.scaleLinear().domain([0,10]).range([h-margin.top-margin.bottom, 0]);
+    	var yScale = d3.scaleLinear().domain([0,10]).range([height, 0]);
 		
 
-		// Axis
-		var yAxis = d3.axisRight(yScale).tickSize(width).tickPadding(5);
-		// A negative tickSize draws the lines above the axis, but we 
-		// need to make sure to offset the axis by the same value.
-		var xAxis = d3.axisBottom(xScale).tickSize(- height).tickPadding(5);
+		
+		var xAxis = d3.axisBottom().scale(xScale).ticks(5);
 
 
-		// Creates a color ramp that corresponds to the 10 different movies
-		//var color = d3.scaleOrdinal(d3.schemeCategory10);
-    	var histoChart = d3.histogram()
-    	.domain(xScale.domain())
-    	.thresholds(xScale.ticks(4))
-    	(tweetsData);
+		// New Layout function
+		// the processed data from d3.histogram returns an array where each array item also has an x0 and x1 field.
+    	var histoChart = d3.histogram();
 
- 
+    	histoChart
+    		.domain([0, 5])
+    		.thresholds([0,1,2,3,4,5])
+    		// Determines the values the histogram bins for
+    		.value(d => d.favorites.length);
 
+ 		// format the data:
+ 		// group the data for the bars
+    	var histoData = histoChart(tweetsData);	
 
 		var mySVG = d3.select("#viz")
 		.append("svg")
     	.attr("width", w)
     	.attr("height", h)
     	.attr("preserveAspectRatio", "xMinYMin meet")
-    	.attr("viewBox", "0 0 500 500")
+    	.attr("viewBox", "0 0 "+ w + " " + h)
   		.append("g")
     	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -217,28 +212,60 @@
 		.attr("transform","translate(0," + height + ")");
 
 
-		mySVG.append("g").attr("id", "yAxisG").call(yAxis);
+		
+		// append the bar rectangles to the svg element
 
-		var bar = mySVG.selectAll(".bar")
-		    .data(histoChart)
+		var bar = mySVG.selectAll(".rect")
+		    .data(histoData)
 		  	.enter()
-		  	.append("g")
+		  	.append("rect")
 		    .attr("class", "bar")
-		    .attr("transform", function(d) { 
-		    	console.log(d);
-		    	return "translate(" + xScale(d.x0) + "," + yScale(d.length) + ")"; });
+		   	.attr('x', d => xScale(d.x0))
+		   	.attr('y', d => yScale(d.length))
+		   	.attr('width', d => xScale(d.x1 - d.x0) - 2 )
+		   	// Formatted data is used to draw the bars
+		   	.attr('height', d => height - yScale(d.length))
+		   	.style('fill', '#55A5AF')
+		   	.on("click", retweets);
+
+		// HERE WE ARE   	
+		bar.append("text")
+		    .attr("dy", ".75em")
+		    .attr("y", 50)
+		    .attr("x", (xScale(histoData[0].x1) - xScale(histoData[0].x0)) / 2)
+		    .attr("text-anchor", "middle")
+		    .text(function(d) { return (d.length); });
 
 
-		bar.append("rect")
-	    .attr("x", 1)
-	    .attr("width", xScale(histoChart[0].x1) - xScale(histoChart[0].x0) - 1)
-	    .attr("height", function(d) { return height - yScale(d.length); }); 
+		 d3
+		 	.select('g#xAxisG')
+		 	.selectAll('text')
+		 	.attr('dx', 50);
 
+
+
+		function retweets(){
+
+			histoChart.value(d => d.retweets.length);
+			histoData = histoChart(tweetsData);
+
+			d3
+				.selectAll('rect')
+				.data(histoData)
+				.transition()
+				.duration(500)
+				.attr('x', d => xScale(d.x0))
+				.attr('y', d => yScale(d.length))
+				.attr('height', d => height - yScale(d.length))
+				.style('fill', '#C470A0');
+		}
 
 	}
 
+
 	d3.json("../data/tweets.json", function(error, data) { 
-		histogram(data.tweets) 
+		if (error) throw error;
+		histogram(data.tweets); 
 	});
 
 
