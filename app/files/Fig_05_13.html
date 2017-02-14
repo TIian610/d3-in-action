@@ -1,0 +1,310 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> 
+
+<html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>D3 in Action</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+		<link rel="icon"  type="image/png" href="../favicon.png" />        
+		<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+        <link href="../dist/css/normalize.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/skeleton.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/prism.css" rel="stylesheet" type="text/css">
+
+        <link rel="stylesheet" href="../dist/css/app.css" rel="stylesheet" type="text/css">
+        
+        
+
+        
+</head>
+
+
+
+	<style rel="stylesheet" type="text/css">
+		
+
+		path.domain {
+		    stroke: none;
+		}
+
+		line{
+		  fill: none;
+		  stroke: none;
+		  shape-rendering: crispEdges;
+		}
+		.axis {
+		  font: 10px sans-serif;
+		}
+
+		path{
+		  stroke: none;
+		  shape-rendering: geometricPrecision;
+		}
+
+
+	</style>
+
+<body>
+
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+		    
+		    <h1><a href="../index.html" media="all" accesskey="0" title="D3 in action">D3 in action</a></h1>
+		    <p>Elijah Meeks</p>
+		    <p>Manning 2015 | 2017</p>
+	    </div>
+	  </div>
+	</div>
+
+
+
+<article>
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+			<h3 id="data">5.3. Stack Layout Example</h3>
+			<p><small></small></p>
+				<div id="viz">
+				</div>
+
+
+			<p class="caption">Figure 5.14 The streamgraph effect from a stack layout with basis interpolation for the areas and using the silhouette and inside-out settings for the stack layout. This is similar to our hand-built example from chapter 4 and shows the same graphical artifacts from the basis interpolation.</p>
+
+
+
+
+		    <pre><code class="language-js">
+day,titanic,avatar,akira,frozen,deliverance,avengers
+1,20,8,3,0,0,0
+2,18,5,1,13,0,0
+3,14,3,1,10,0,0
+4,7,3,0,5,27,15
+5,4,3,0,2,20,14
+6,3,1,0,0,10,13
+7,2,0,0,0,8,12
+8,0,0,0,0,6,11
+9,0,0,0,0,3,9
+10,0,0,0,0,1,8
+
+
+		    </code></pre>
+
+
+	    </div>
+	  </div>
+	</div>
+		
+		
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+
+			<pre><code class="language-markup"> <script type="prism-html-markup">
+<div id="viz">
+</div>
+</script>			    
+			</code></pre>
+	
+			<pre><code class="language-js">
+// https://github.com/d3/d3-shape/blob/master/README.md#stack
+
+var h = 600,
+	w = 600;
+var margin = {top: 20, right: 20, bottom: 20, left: 20};
+var width =  w - margin.left - margin.right,
+ 	height = h - margin.top -  margin.bottom;
+var fillScale = d3.scaleOrdinal().range(["#fcd88a", "#cf7c1c", "#93c464", '#75734F']);
+
+
+
+function dataViz(data){
+
+	var xScale = d3.scaleLinear().domain([0, 10]).range([0, width]);
+	var yScale = d3.scaleLinear().domain([0, 100]).range([height, 0]);
+	var movies = ["titanic", "avatar", "akira", "frozen", "deliverance", "avengers"];
+	var fillScale = d3.scaleOrdinal()
+ 		.domain(movies)
+ 		.range(["#fcd88a", "#cf7c1c", "#93c464", "#75734F", "#5eafc6", "#41a368"]);
+
+ 	// LAYOUT GENERATOR	FUNCTION
+ 	// Like the pie generator, the stack generator does not produce a shape directly. 
+ 	// Instead it computes positions which you can then pass to an area generator or use directly, say to position bars.
+ 	var stackLayout = d3
+ 		.stack() // Constructs a new stack generator with the default settings.
+ 		.offset(d3.stackOffsetSilhouette)
+ 		.order(d3.stackOrderInsideOut) // determines the order in which areas are drawn
+ 		// The movies dataset that we use happens to be perfectly suited to the default stack formatting. 
+ 		// All you need to do is pass an array of keys for each object, which happens to also be the domain of our colorScale.
+ 		.keys(movies);	// keys accessor
+
+ 	// The resulting array has one element per series. 
+ 	// Each series has one point per day, and each point has a lower and upper value defining the baseline and topline:
+
+ 	var series = stackLayout(data); // [Array[10], Array[10], Array[10], Array[10], Array[10], Array[10]]
+ 	console.log(series);	
+ 	yScale.domain([-50, 50]);
+
+
+ 	// AREA GENERATOR: If we use the stack layout to create a streamgraph, then it requires a corresponding area generator.
+ 	// The stack layout is going to return an array of two item arrays, 
+ 	// the first is the lower bound and the second is the upper bound, 
+ 	// the index position can be used for the x-position.
+
+ 	// When your index position is sufficient, just use that, otherwise, 
+ 	// d.data still has the original data so if you need access to it for your scale, you can use that.
+	var stackArea = d3
+		.area()
+	    .x((d, i) => xScale(i)) // i is the  keys accessor
+	    .y0(d => yScale(d[0])) 	// y0 is the lower value (baseline)
+	    .y1(d => yScale(d[1])); // y1 is the upper value (topline)
+
+	stackArea.curve(d3.curveBasis);
+
+	var mySVG = d3.select("#viz")
+		.append("svg")
+    	.attr("width", w)
+    	.attr("height", h)
+    	.attr("preserveAspectRatio", "xMinYMin meet")
+    	.attr("viewBox", "0 0 "+ w + " " + h);
+
+
+
+    mySVG
+    	.selectAll("path")
+  		.data(series) // data(stackLayout(data))
+  		.enter()
+  		.append("path")
+  		.style("fill", d => fillScale(d.key)) // Each array of stacked data has a key property that corresponds to the keys you sent in your layout generator.
+  		// Each series in then typically passed to an area generator to render an area chart
+  		.attr("d", d => stackArea(d));
+    
+
+
+}
+
+d3.csv("../data/movies2.csv", dataViz)	
+
+
+
+			</code></pre>
+
+	    </div>
+	  </div>
+	</div>
+	
+	
+</article>
+
+
+<script src="../dist/js/vendors/d3.min.js" type="text/javaScript"></script>
+
+<!-- http://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3 -->
+<script src="../dist/js/colorbrewer.js" type="text/javascript"></script>
+
+<script>
+	
+
+(function(scope, d3) {
+	
+	// https://github.com/d3/d3-shape/blob/master/README.md#stack
+
+	var h = 600,
+		w = 600;
+	var margin = {top: 20, right: 20, bottom: 20, left: 20};
+	var width =  w - margin.left - margin.right,
+    	height = h - margin.top -  margin.bottom;
+	var fillScale = d3.scaleOrdinal().range(["#fcd88a", "#cf7c1c", "#93c464", '#75734F']);
+	
+
+
+	function dataViz(data){
+
+		var xScale = d3.scaleLinear().domain([0, 10]).range([0, width]);
+		var yScale = d3.scaleLinear().domain([0, 100]).range([height, 0]);
+		var movies = ["titanic", "avatar", "akira", "frozen", "deliverance", "avengers"];
+		var fillScale = d3.scaleOrdinal()
+    		.domain(movies)
+    		.range(["#fcd88a", "#cf7c1c", "#93c464", "#75734F", "#5eafc6", "#41a368"]);
+
+    	// LAYOUT GENERATOR	FUNCTION
+    	// Like the pie generator, the stack generator does not produce a shape directly. 
+    	// Instead it computes positions which you can then pass to an area generator or use directly, say to position bars.
+    	var stackLayout = d3
+    		.stack() // Constructs a new stack generator with the default settings.
+    		.offset(d3.stackOffsetSilhouette)
+    		.order(d3.stackOrderInsideOut) // determines the order in which areas are drawn
+    		// The movies dataset that we use happens to be perfectly suited to the default stack formatting. 
+    		// All you need to do is pass an array of keys for each object, which happens to also be the domain of our colorScale.
+    		.keys(movies);	// keys accessor
+
+    	// The resulting array has one element per series. 
+    	// Each series has one point per day, and each point has a lower and upper value defining the baseline and topline:
+
+    	var series = stackLayout(data); // [Array[10], Array[10], Array[10], Array[10], Array[10], Array[10]]
+    	console.log(series);	
+    	yScale.domain([-50, 50]);
+
+
+    	// AREA GENERATOR: If we use the stack layout to create a streamgraph, then it requires a corresponding area generator.
+    	// The stack layout is going to return an array of two item arrays, 
+    	// the first is the lower bound and the second is the upper bound, 
+    	// the index position can be used for the x-position.
+
+    	// When your index position is sufficient, just use that, otherwise, 
+    	// d.data still has the original data so if you need access to it for your scale, you can use that.
+		var stackArea = d3
+			.area()
+		    .x((d, i) => xScale(i)) // i is the  keys accessor
+		    .y0(d => yScale(d[0])) 	// y0 is the lower value (baseline)
+		    .y1(d => yScale(d[1])); // y1 is the upper value (topline)
+
+		stackArea.curve(d3.curveBasis);
+
+		var mySVG = d3.select("#viz")
+			.append("svg")
+	    	.attr("width", w)
+	    	.attr("height", h)
+	    	.attr("preserveAspectRatio", "xMinYMin meet")
+	    	.attr("viewBox", "0 0 "+ w + " " + h);
+
+
+
+	    mySVG
+	    	.selectAll("path")
+     		.data(series) // data(stackLayout(data))
+     		.enter()
+     		.append("path")
+     		.style("fill", d => fillScale(d.key)) // Each array of stacked data has a key property that corresponds to the keys you sent in your layout generator.
+     		// Each series in then typically passed to an area generator to render an area chart
+     		.attr("d", d => stackArea(d));
+	    
+
+
+	}
+
+	d3.csv("../data/movies2.csv", dataViz)	
+
+})(window, d3);	
+
+
+
+
+</script>
+<script src="../dist/js/prism.js" type="text/javaScript"></script>
+
+</body>
+
+</html>

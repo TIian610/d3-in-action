@@ -132,6 +132,108 @@
 	
 			<pre><code class="language-js">
 
+// set the dimensions and margins of the graph
+
+var h = 540,
+	w = 500;
+var margin = {top: 10, right: 10, bottom: 30, left: 10};
+var width =  w - margin.left - margin.right,
+	height = h - margin.top -  margin.bottom;
+
+function histogram(tweetsData) {
+	console.log(tweetsData);
+
+	// Escales: set the ranges
+	var xScale = d3.scaleLinear().domain([0,5]).rangeRound([0,width - margin.right]);
+	// Scale is inverted, so higher values are drawn higher up and lower values toward the bottom
+	var yScale = d3.scaleLinear().domain([0,10]).range([height, 0]);
+	
+
+	
+	var xAxis = d3.axisBottom().scale(xScale).ticks(5);
+
+
+	// New Layout function
+	// the processed data from d3.histogram returns an array where each array item also has an x0 and x1 field.
+	var histoChart = d3.histogram();
+
+	histoChart
+		.domain([0, 5])
+		.thresholds([0,1,2,3,4,5])
+		// Determines the values the histogram bins for
+		.value(d => d.favorites.length);
+
+	// format the data:
+	// group the data for the bars
+	var histoData = histoChart(tweetsData);	
+		console.log("before", 	histoData);
+	var mySVG = d3.select("#viz")
+	.append("svg")
+	.attr("width", w)
+	.attr("height", h)
+	.attr("preserveAspectRatio", "xMinYMin meet")
+	.attr("viewBox", "0 0 "+ w + " " + h)
+	.append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+	mySVG.append("g")
+	.attr("id", "xAxisG")
+	.call(xAxis);
+
+	d3.selectAll("#xAxisG")
+	.attr("transform","translate(0," + height + ")");
+
+
+	
+	// append the bar rectangles to the svg element
+
+	var bar = mySVG.selectAll(".rect")
+	    .data(histoData)
+	  	.enter()
+	  	.append("rect")
+	    .attr("class", "bar")
+	   	.attr('x', d => xScale(d.x0))
+	   	.attr('y', d => yScale(d.length))
+	   	.attr('width', d => xScale(d.x1 - d.x0) - 2 )
+	   	// Formatted data is used to draw the bars
+	   	.attr('height', d => height - yScale(d.length))
+	   	.style('fill', '#55A5AF')
+	   	.on("click", retweets);
+
+
+
+	 d3
+	 	.select('g#xAxisG')
+	 	.selectAll('text')
+	 	.attr('dx', 50);
+
+
+
+	function retweets(){
+
+		histoChart.value(d => d.retweets.length);
+		histoData = histoChart(tweetsData); // array[5]
+		console.log('after',histoData);
+
+		d3
+			.selectAll('rect')
+			.data(histoData)
+			.transition()
+			.duration(500)
+			.attr('x', d => xScale(d.x0))
+			.attr('y', d => yScale(d.length))
+			.attr('height', d => height - yScale(d.length))
+			.style('fill', '#C470A0');
+	}
+
+}
+
+
+d3.json("../data/tweets.json", function(error, data) { 
+	if (error) throw error;
+	histogram(data.tweets); 
+});
 
 
 			</code></pre>
@@ -189,7 +291,7 @@
  		// format the data:
  		// group the data for the bars
     	var histoData = histoChart(tweetsData);	
-
+			console.log("before", 	histoData);
 		var mySVG = d3.select("#viz")
 		.append("svg")
     	.attr("width", w)
@@ -228,13 +330,6 @@
 		   	.style('fill', '#55A5AF')
 		   	.on("click", retweets);
 
-		// HERE WE ARE   	
-		bar.append("text")
-		    .attr("dy", ".75em")
-		    .attr("y", 50)
-		    .attr("x", (xScale(histoData[0].x1) - xScale(histoData[0].x0)) / 2)
-		    .attr("text-anchor", "middle")
-		    .text(function(d) { return (d.length); });
 
 
 		 d3
@@ -247,7 +342,8 @@
 		function retweets(){
 
 			histoChart.value(d => d.retweets.length);
-			histoData = histoChart(tweetsData);
+			histoData = histoChart(tweetsData); // array[5]
+			console.log('after',histoData);
 
 			d3
 				.selectAll('rect')
