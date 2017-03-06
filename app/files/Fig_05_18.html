@@ -1,0 +1,435 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> 
+
+<html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>D3 in Action</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+		<link rel="icon"  type="image/png" href="../favicon.png" />        
+		<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+        <link href="../dist/css/normalize.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/skeleton.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/prism.css" rel="stylesheet" type="text/css">
+
+        <link rel="stylesheet" href="../dist/css/app.css" rel="stylesheet" type="text/css">
+        
+        
+
+        
+</head>
+
+
+
+	<style rel="stylesheet" type="text/css">
+		
+
+		path.domain {
+		    stroke: none;
+		}
+
+		line{
+		  fill: none;
+		  stroke: none;
+		  shape-rendering: crispEdges;
+		}
+		.axis {
+		  font: 10px sans-serif;
+		}
+
+		path{
+		  stroke: none;
+		  shape-rendering: geometricPrecision;
+		}
+
+
+	</style>
+
+<body>
+
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+		    
+		    <h1><a href="../index.html" media="all" accesskey="0" title="D3 in action">D3 in action</a></h1>
+		    <p>Elijah Meeks</p>
+		    <p>Manning 2015 | 2017</p>
+	    </div>
+	  </div>
+	</div>
+
+
+
+<article>
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+			<h3 id="data">5.4.1. Sankey diagram</h3>
+			<p><small></small></p>
+				<div id="viz">
+				</div>
+
+
+			<p class="caption">Figure 5.17 A Sankey diagram where the number of visitors is represented in the color of the path. The flow between index and contact has an increased opacity as the result of a mouseover event.</p>
+
+			<p class="caption">Figure 5.19 The Sankey layout algorithm attempts to optimize the positioning of nodes to reduce overlap. The chart reflects the position of nodes after (from left to right) 1 pass, 20 passes, 100 passes, and 200 passes.</p>
+
+
+		    <pre><code class="language-js">
+
+// the nodes are the web pages, the links are the visitors who go from one page to another (if any), 
+// and the value of each link is the total number of visitors who move from that page to the next.
+
+
+// Each entry in this array represents a web page.
+{"nodes":[
+	{"name":"index"},
+	{"name":"about"},
+	{"name":"contact"},
+	{"name":"store"},
+	{"name":"cheese"},
+	{"name":"yogurt"},
+	{"name":"milk"}
+	],
+	// Each entry in this array represents the number of times someone navigated from the "source" page to the "target" page.
+	"links":[
+	{"source":0,"target":1,"value":25}, // 25 people navigated from the home page to the about page
+	{"source":0,"target":2,"value":10},
+	{"source":0,"target":3,"value":40},
+	{"source":1,"target":2,"value":10},
+	{"source":3,"target":4,"value":25},
+	{"source":3,"target":5,"value":10},
+	{"source":3,"target":6,"value":5},
+	{"source":4,"target":6,"value":5},
+	{"source":4,"target":5,"value":15}
+	]
+}
+
+		    </code></pre>
+
+
+	    </div>
+	  </div>
+	</div>
+		
+		
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+
+			<pre><code class="language-markup"> <script type="prism-html-markup">
+<div id="viz">
+</div>
+</script>			    
+			</code></pre>
+	
+			<pre><code class="language-js">
+// https://bl.ocks.org/d3noob/013054e8d7807dff76247b81b0e29030
+
+var h = 600,
+	w = 600;
+var margin = {top: 20, right: 20, bottom: 20, left: 20};
+var width =  w - margin.left - margin.right,
+	height = h - margin.top -  margin.bottom;
+var fillScale = d3.scaleOrdinal().range(["#fcd88a", "#cf7c1c", "#93c464", '#75734F']);
+
+
+function dataViz(data){
+
+
+
+	var sankey = d3.sankey()
+		// Where to start and stop drawing the flows between nodes
+		.nodeWidth(20)
+		// The distance between nodes vertically; 
+		// a lower value creates longer bars representing our web pages
+		.nodePadding(200)
+		.size([ width, height ])
+		.nodes(data.nodes)
+		.links(data.links)
+		// The number of times to run the layout to optimize placement of flows
+		.layout(200);
+
+	console.log('sankey:::', sankey);
+
+
+	var intensityRamp = d3
+		.scaleLinear()
+		.domain([ 0, d3.max(data.links, d => d.value) ])
+		.range(["#fcd88b", "#cf7d1c"]); 
+
+	var mySVG = d3.select("#viz")
+		.append("svg")
+    	.attr("width", w)
+    	.attr("height", h)
+    	.attr("preserveAspectRatio", "xMinYMin meet")
+    	.attr("viewBox", "0 0 "+ w + " " + h);
+
+
+	mySVG
+		.append("g")
+		// Offsets the parent <g> of the entire chart
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+		.attr("id", "sankeyG");
+
+
+	d3.select("#sankeyG")
+		.selectAll(".link")
+		.data(data.links)
+		.enter()
+		.append("path")
+		.attr("class", "link")
+		// Sankey layout’s .link() function is a path generator
+		.attr("d", sankey.link())
+		// Note that layout expects us to use a thick stroke and not a filled area.
+		.style("stroke-width", d => d.dy)
+		.style("stroke-opacity", .5)
+		.style("fill", "none")
+		// Sets the stroke color using our intensity ramp, black to red indicating weak to strong
+		.style("stroke", d => intensityRamp(d.value))
+		.sort((a, b) => b.dy - a.dy)
+		.on("mouseover", function() {
+
+			d3.select(this)
+				// Emphasizes the link when we mouse over it by making it less transparent
+				.style("stroke-opacity", .8); 
+		})
+		.on("mouseout", () => {
+			
+			d3.selectAll("path.link")
+				.style("stroke-opacity", .5); 
+		});
+  
+
+		d3.select("#sankeyG")
+			.selectAll(".node")
+			.data(data.nodes)
+			.enter()
+			.append("g")
+			.attr("class", "node")
+			// Calculates node position as x and y coordinates from our data
+
+			.attr("transform", d =>"translate(" + d.x + "," + d.y + ")")  
+
+		d3.selectAll(".node")
+			.append("rect")
+			.attr("height", d => d.dy)
+			.attr("width", 20)
+			.style("fill", "#93c464")
+			.style("stroke", "gray");
+
+		d3.selectAll(".node")
+			.append("text")
+			.attr("x", 0)
+			.attr("y", d => d.dy / 2)
+			.attr("text-anchor", "middle")
+			.style("fill", "black")
+			.text(d => d.name);
+
+		
+		var numLayouts = 1; 
+
+		mySVG.on("click", moreLayouts); 
+		
+		// Initializes the sankey with only a single layout pass
+		sankey.layout(numLayouts);
+
+		function moreLayouts() {
+			// We choose 20 passes because it shows some change without requiring us to click too much.
+			numLayouts += 20;
+			sankey.layout(numLayouts); 
+
+			d3.selectAll(".link")
+				.transition()
+				.duration(500)
+				// Because the layout updates the dataset, we just have to call the drawing functions again and they automatically update.
+				.attr("d", sankey.link());
+
+			d3.selectAll(".node")
+				.transition()
+				.duration(500)
+				.attr("transform", d =>"translate(" + d.x + "," + d.y + ")") };
+
+    
+
+
+}
+
+d3.json("../data/sitestats.json", dataViz)	
+			</code></pre>
+
+	    </div>
+	  </div>
+	</div>
+	
+	
+</article>
+
+
+<script src="../dist/js/vendors/d3.min.js" type="text/javaScript"></script>
+
+
+<!-- http://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3 -->
+<script src="../dist/js/colorbrewer.js" 	type="text/javascript"></script>
+<script src="../dist/js/d3-sankey.min.js" 	type="text/javascript"></script>
+
+<script>
+	
+
+(function(scope, d3) {
+
+	// https://bl.ocks.org/d3noob/013054e8d7807dff76247b81b0e29030
+
+	var h = 600,
+		w = 600;
+	var margin = {top: 20, right: 20, bottom: 20, left: 20};
+	var width =  w - margin.left - margin.right,
+    	height = h - margin.top -  margin.bottom;
+	var fillScale = d3.scaleOrdinal().range(["#fcd88a", "#cf7c1c", "#93c464", '#75734F']);
+	
+
+	function dataViz(data){
+
+
+
+		var sankey = d3.sankey()
+			// Where to start and stop drawing the flows between nodes
+			.nodeWidth(20)
+			// The distance between nodes vertically; 
+			// a lower value creates longer bars representing our web pages
+			.nodePadding(200)
+			.size([ width, height ])
+			.nodes(data.nodes)
+			.links(data.links)
+			// The number of times to run the layout to optimize placement of flows
+			.layout(200);
+
+		console.log('sankey:::', sankey);
+
+
+		var intensityRamp = d3
+			.scaleLinear()
+			.domain([ 0, d3.max(data.links, d => d.value) ])
+			.range(["#fcd88b", "#cf7d1c"]); 
+
+		var mySVG = d3.select("#viz")
+			.append("svg")
+	    	.attr("width", w)
+	    	.attr("height", h)
+	    	.attr("preserveAspectRatio", "xMinYMin meet")
+	    	.attr("viewBox", "0 0 "+ w + " " + h);
+
+	
+		mySVG
+			.append("g")
+			// Offsets the parent <g> of the entire chart
+			.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+			.attr("id", "sankeyG");
+
+    
+   		d3.select("#sankeyG")
+   			.selectAll(".link")
+			.data(data.links)
+			.enter()
+			.append("path")
+			.attr("class", "link")
+			// Sankey layout’s .link() function is a path generator
+			.attr("d", sankey.link())
+			// Note that layout expects us to use a thick stroke and not a filled area.
+			.style("stroke-width", d => d.dy)
+			.style("stroke-opacity", .5)
+			.style("fill", "none")
+			// Sets the stroke color using our intensity ramp, black to red indicating weak to strong
+			.style("stroke", d => intensityRamp(d.value))
+			.sort((a, b) => b.dy - a.dy)
+			.on("mouseover", function() {
+
+				d3.select(this)
+					// Emphasizes the link when we mouse over it by making it less transparent
+					.style("stroke-opacity", .8); 
+			})
+			.on("mouseout", () => {
+				
+				d3.selectAll("path.link")
+					.style("stroke-opacity", .5); 
+			});
+      
+
+			d3.select("#sankeyG")
+				.selectAll(".node")
+				.data(data.nodes)
+				.enter()
+				.append("g")
+				.attr("class", "node")
+				// Calculates node position as x and y coordinates from our data
+
+				.attr("transform", d =>"translate(" + d.x + "," + d.y + ")")  
+  
+			d3.selectAll(".node")
+				.append("rect")
+				.attr("height", d => d.dy)
+				.attr("width", 20)
+				.style("fill", "#93c464")
+				.style("stroke", "gray");
+
+			d3.selectAll(".node")
+				.append("text")
+				.attr("x", 0)
+				.attr("y", d => d.dy / 2)
+				.attr("text-anchor", "middle")
+				.style("fill", "black")
+				.text(d => d.name);
+
+			
+			var numLayouts = 1; 
+
+			mySVG.on("click", moreLayouts); 
+			
+			// Initializes the sankey with only a single layout pass
+			sankey.layout(numLayouts);
+
+			function moreLayouts() {
+				// We choose 20 passes because it shows some change without requiring us to click too much.
+				numLayouts += 20;
+				sankey.layout(numLayouts); 
+
+				d3.selectAll(".link")
+					.transition()
+   					.duration(500)
+   					// Because the layout updates the dataset, we just have to call the drawing functions again and they automatically update.
+					.attr("d", sankey.link());
+
+				d3.selectAll(".node")
+					.transition()
+					.duration(500)
+					.attr("transform", d =>"translate(" + d.x + "," + d.y + ")") };
+
+	    
+
+
+	}
+
+	d3.json("../data/sitestats.json", dataViz)	
+
+})(window, d3);	
+
+
+
+
+</script>
+<script src="../dist/js/prism.js" type="text/javaScript"></script>
+
+</body>
+
+</html>
