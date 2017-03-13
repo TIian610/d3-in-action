@@ -1,0 +1,459 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> 
+
+<html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>D3 in Action</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+		<link rel="icon"  type="image/png" href="../favicon.png" />        
+		<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+        <link href="../dist/css/normalize.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/skeleton.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/prism.css" rel="stylesheet" type="text/css">
+
+        <link rel="stylesheet" href="../dist/css/app.css" rel="stylesheet" type="text/css">
+        
+        
+
+        
+</head>
+
+
+
+	<style rel="stylesheet" type="text/css">
+		
+
+		div#ex1 {
+		    background: white;
+		    padding: 20px;
+		    width: 100%;
+		    height: 400px;
+		    overflow: auto;
+		}
+	</style>
+
+<body>
+
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+		    
+		    <h1><a href="../index.html" media="all" accesskey="0" title="D3 in action">D3 in action</a></h1>
+		    <p>Elijah Meeks</p>
+		    <p>Manning 2015 | 2017</p>
+	    </div>
+	  </div>
+	</div>
+
+
+
+<article>
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+			<h3 id="data">6.3 Pack layouts</h3>
+			<p><small></small></p>
+
+				<div id="viz">
+				</div>
+
+
+
+
+
+			<p class="caption">Figure 6.6 Each tweet is represented by a green circle nested inside an orange circle that represents the user who made the tweet. One of those green circles is exactly the same size as its parent orange circle, which we address below. The users are all nested inside a blue circle that represents our “root” node.</p>
+
+
+			<p class="caption">Figure 6.7 An example of a fixed margin based on hierarchical depth. We can create this by reducing the circle size of each node based on its computed “depth” value.</p>
+
+			<p class="caption">Figure 6.8 A circle-packing layout with the size of the leaf nodes set to the impact factor of those nodes.</p>
+
+		    <pre><code class="language-js">
+{
+	"tweets": [
+	{"user": "Al", "content": "I really love seafood.", "timestamp": " Mon Dec 23 2013 21:30 GMT-0800 (PST)", "retweets": ["Raj","Pris","Roy"], "favorites": ["Sam"]},
+	{"user": "Al", "content": "I take that back, this doesn't taste so good.", "timestamp": "Mon Dec 23 2013 21:55 GMT-0800 (PST)", "retweets": ["Roy"], "favorites": []},
+	{"user": "Al", "content": "From now on, I'm only eating cheese sandwiches.", "timestamp": "Mon Dec 23 2013 22:22 GMT-0800 (PST)", "retweets": [], "favorites": ["Roy","Sam"]},
+	{"user": "Roy", "content": "Great workout!", "timestamp": " Mon Dec 23 2013 7:20 GMT-0800 (PST)", "retweets": [], "favorites": []},
+	{"user": "Roy", "content": "Spectacular oatmeal!", "timestamp": " Mon Dec 23 2013 7:23 GMT-0800 (PST)", "retweets": [], "favorites": []},
+	{"user": "Roy", "content": "Amazing traffic!", "timestamp": " Mon Dec 23 2013 7:47  GMT-0800 (PST)", "retweets": [], "favorites": []},
+	{"user": "Roy", "content": "Just got a ticket for texting and driving!", "timestamp": " Mon Dec 23 2013 8:05 GMT-0800 (PST)", "retweets": [], "favorites": ["Sam", "Sally", "Pris"]},
+	{"user": "Pris", "content": "Going to have some boiled eggs.", "timestamp": " Mon Dec 23 2013 18:23 GMT-0800 (PST)", "retweets": [], "favorites": ["Sally"]},
+	{"user": "Pris", "content": "Maybe practice some gymnastics.", "timestamp": " Mon Dec 23 2013 19:47  GMT-0800 (PST)", "retweets": [], "favorites": ["Sally"]},
+	{"user": "Sam", "content": "@Roy Let's get lunch", "timestamp": " Mon Dec 23 2013 11:05 GMT-0800 (PST)", "retweets": ["Pris"], "favorites": ["Sally", "Pris"]}
+	]
+}
+		    </code></pre>
+
+
+	    </div>
+	  </div>
+	</div>
+		
+		
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+
+			<pre><code class="language-markup"> <script type="prism-html-markup">
+<div id="viz">
+</div>
+</script>			    
+			</code></pre>
+	
+			<pre><code class="language-js">
+
+var h = 600,
+	w = 600;
+var margin = {top: 20, right: 20, bottom: 20, left: 20};
+var width =  w - margin.left - margin.right,
+	height = h - margin.top -  margin.bottom;
+
+
+
+
+function dataViz(data){
+	console.log('Hello from dataViz');
+
+	var depthScale = d3
+	 	.scaleOrdinal()
+		.range(["#5EAFC6", "#FE9922", "#93c464", "#75739F"]);
+
+	var nestedTweets = d3
+		.nest()
+		.key(d => d.user)
+		.entries(data.tweets);
+
+	console.log(JSON.stringify(nestedTweets));
+
+	/*
+
+	[{
+	    "key": "Al",
+	    "values": [{
+	        "user": "Al",
+	        "content": "I really love seafood.",
+	        "timestamp": " Mon Dec 23 2013 21:30 GMT-0800 (PST)",
+	        "retweets": ["Raj", "Pris", "Roy"],
+	        "favorites": ["Sam"]
+	    }, {
+	        "user": "Al",
+	        "content": "I take that back, this doesn't taste so good.",
+	        "timestamp": "Mon Dec 23 2013 21:55 GMT-0800 (PST)",
+	        "retweets": ["Roy"],
+	        "favorites": []
+	    }, {
+	        "user": "Al",
+	        "content": "From now on, I'm only eating cheese sandwiches.",
+	        "timestamp": "Mon Dec 23 2013 22:22 GMT-0800 (PST)",
+	        "retweets": [],
+	        "favorites": ["Roy", "Sam"]
+	    }]
+	}, {
+	    "key": "Roy",
+	    "values": [{
+	        "user": "Roy",
+	        "content": "Great workout!",
+	        "timestamp": " Mon Dec 23 2013 7:20 GMT-0800 (PST)",
+	        "retweets": [],
+	        "favorites": []
+	    }, {
+	        "user": "Roy",
+	        "content": "Spectacular oatmeal!",
+	        "timestamp": " Mon Dec 23 2013 7:23 GMT-0800 (PST)",
+	        "retweets": [],
+	        "favorites": []
+	    }, {
+	        "user": "Roy",
+	        "content": "Amazing traffic!",
+	        "timestamp": " Mon Dec 23 2013 7:47  GMT-0800 (PST)",
+	        "retweets": [],
+	        "favorites": []
+	    }, {
+	        "user": "Roy",
+	        "content": "Just got a ticket for texting and driving!",
+	        "timestamp": " Mon Dec 23 2013 8:05 GMT-0800 (PST)",
+	        "retweets": [],
+	        "favorites": ["Sam", "Sally", "Pris"]
+	    }]
+	}, {
+	    "key": "Pris",
+	    "values": [{
+	        "user": "Pris",
+	        "content": "Going to have some boiled eggs.",
+	        "timestamp": " Mon Dec 23 2013 18:23 GMT-0800 (PST)",
+	        "retweets": [],
+	        "favorites": ["Sally"]
+	    }, {
+	        "user": "Pris",
+	        "content": "Maybe practice some gymnastics.",
+	        "timestamp": " Mon Dec 23 2013 19:47  GMT-0800 (PST)",
+	        "retweets": [],
+	        "favorites": ["Sally"]
+	    }]
+	}, {
+	    "key": "Sam",
+	    "values": [{
+	        "user": "Sam",
+	        "content": "@Roy Let's get lunch",
+	        "timestamp": " Mon Dec 23 2013 11:05 GMT-0800 (PST)",
+	        "retweets": ["Pris"],
+	        "favorites": ["Sally", "Pris"]
+	    }]
+	}]
+
+	*/
+
+
+
+	// Puts the array that d3.nest creates inside a "root" object that acts as the top-level parent
+	var packableTweets = {id: "All Tweets", values: nestedTweets};
+	// Initialize the pack layout
+	var packChart = d3.pack();
+	
+	packChart.size([width,height]);
+	packChart.padding(10);
+
+	// Process the hierarchy with an accessor function for child elements to look for "values", 
+	// which matches the data created by d3.nest
+	var root = d3
+		.hierarchy(packableTweets, d => d.values)
+		// Adds 1 so that tweets with no retweets or favorites still have a value greater than zero and are displayed along with checking to make sure it has a retweets property
+		.sum(d => d.retweets ? d.retweets.length + d.favorites.length + 1 : undefined);
+
+	console.log('pack:::', packChart(root));
+
+	// pack::: ws {data: Object, height: 2, depth: 0, parent: null, children: Array[4]…}
+
+
+
+	var mySVG = d3.select("#viz")
+		.append("svg")
+		.attr("width", w)
+		.attr("height", h)
+		.attr("preserveAspectRatio", "xMinYMin meet")
+		.attr("viewBox", "0 0 "+ w + " " + h);
+
+
+	var g = mySVG
+		.append('svg:g')
+		.attr("transform", "translate(0,0)")
+		.selectAll("circle")
+		.data(packChart(root)
+		.descendants())
+		.enter()
+		.append("circle")
+		.attr("r", d => d.r)
+		.attr("cx", d => d.x)
+		.attr("cy", d => d.y)
+		.style("fill", d => depthScale(d.depth))
+		.style("stroke", "black");	
+
+
+
+}
+
+
+d3.json("../data/tweets.json", dataViz);	
+
+
+
+			</code></pre>
+
+	    </div>
+	  </div>
+	</div>
+	
+	
+</article>
+
+
+<script src="../dist/js/vendors/d3.min.js" type="text/javaScript"></script>
+
+
+<!-- http://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3 -->
+<script src="../dist/js/colorbrewer.js" 	type="text/javascript"></script>
+<script src="../dist/js/cloud.js" 	type="text/javascript"></script>
+
+<script>
+	
+
+(function(scope, d3) {
+
+
+	var h = 600,
+		w = 600;
+	var margin = {top: 20, right: 20, bottom: 20, left: 20};
+	var width =  w - margin.left - margin.right,
+    	height = h - margin.top -  margin.bottom;
+
+
+
+
+	function dataViz(data){
+		console.log('Hello from dataViz');
+
+		var depthScale = d3
+		 	.scaleOrdinal()
+			.range(["#5EAFC6", "#FE9922", "#93c464", "#75739F"]);
+
+		var nestedTweets = d3
+			.nest()
+			.key(d => d.user)
+			.entries(data.tweets);
+
+		console.log(JSON.stringify(nestedTweets));
+
+		/*
+
+[{
+    "key": "Al",
+    "values": [{
+        "user": "Al",
+        "content": "I really love seafood.",
+        "timestamp": " Mon Dec 23 2013 21:30 GMT-0800 (PST)",
+        "retweets": ["Raj", "Pris", "Roy"],
+        "favorites": ["Sam"]
+    }, {
+        "user": "Al",
+        "content": "I take that back, this doesn't taste so good.",
+        "timestamp": "Mon Dec 23 2013 21:55 GMT-0800 (PST)",
+        "retweets": ["Roy"],
+        "favorites": []
+    }, {
+        "user": "Al",
+        "content": "From now on, I'm only eating cheese sandwiches.",
+        "timestamp": "Mon Dec 23 2013 22:22 GMT-0800 (PST)",
+        "retweets": [],
+        "favorites": ["Roy", "Sam"]
+    }]
+}, {
+    "key": "Roy",
+    "values": [{
+        "user": "Roy",
+        "content": "Great workout!",
+        "timestamp": " Mon Dec 23 2013 7:20 GMT-0800 (PST)",
+        "retweets": [],
+        "favorites": []
+    }, {
+        "user": "Roy",
+        "content": "Spectacular oatmeal!",
+        "timestamp": " Mon Dec 23 2013 7:23 GMT-0800 (PST)",
+        "retweets": [],
+        "favorites": []
+    }, {
+        "user": "Roy",
+        "content": "Amazing traffic!",
+        "timestamp": " Mon Dec 23 2013 7:47  GMT-0800 (PST)",
+        "retweets": [],
+        "favorites": []
+    }, {
+        "user": "Roy",
+        "content": "Just got a ticket for texting and driving!",
+        "timestamp": " Mon Dec 23 2013 8:05 GMT-0800 (PST)",
+        "retweets": [],
+        "favorites": ["Sam", "Sally", "Pris"]
+    }]
+}, {
+    "key": "Pris",
+    "values": [{
+        "user": "Pris",
+        "content": "Going to have some boiled eggs.",
+        "timestamp": " Mon Dec 23 2013 18:23 GMT-0800 (PST)",
+        "retweets": [],
+        "favorites": ["Sally"]
+    }, {
+        "user": "Pris",
+        "content": "Maybe practice some gymnastics.",
+        "timestamp": " Mon Dec 23 2013 19:47  GMT-0800 (PST)",
+        "retweets": [],
+        "favorites": ["Sally"]
+    }]
+}, {
+    "key": "Sam",
+    "values": [{
+        "user": "Sam",
+        "content": "@Roy Let's get lunch",
+        "timestamp": " Mon Dec 23 2013 11:05 GMT-0800 (PST)",
+        "retweets": ["Pris"],
+        "favorites": ["Sally", "Pris"]
+    }]
+}]
+
+		*/
+
+
+
+		// Puts the array that d3.nest creates inside a "root" object that acts as the top-level parent
+		var packableTweets = {id: "All Tweets", values: nestedTweets};
+		// Initialize the pack layout
+		var packChart = d3.pack();
+		
+		packChart.size([width,height]);
+		packChart.padding(10);
+
+		// Process the hierarchy with an accessor function for child elements to look for "values", 
+		// which matches the data created by d3.nest
+		var root = d3
+			.hierarchy(packableTweets, d => d.values)
+			// Adds 1 so that tweets with no retweets or favorites still have a value greater than zero and are displayed along with checking to make sure it has a retweets property
+			.sum(d => d.retweets ? d.retweets.length + d.favorites.length + 1 : undefined);
+
+		console.log('pack:::', packChart(root));
+
+		// pack::: ws {data: Object, height: 2, depth: 0, parent: null, children: Array[4]…}
+
+
+
+		var mySVG = d3.select("#viz")
+			.append("svg")
+			.attr("width", w)
+			.attr("height", h)
+			.attr("preserveAspectRatio", "xMinYMin meet")
+			.attr("viewBox", "0 0 "+ w + " " + h);
+
+
+		var g = mySVG
+			.append('svg:g')
+			.attr("transform", "translate(0,0)")
+			.selectAll("circle")
+			.data(packChart(root)
+			.descendants())
+			.enter()
+			.append("circle")
+			.attr("r", d => d.r)
+			.attr("cx", d => d.x)
+			.attr("cy", d => d.y)
+			.style("fill", d => depthScale(d.depth))
+			.style("stroke", "black");	
+
+
+
+	}
+
+
+	d3.json("../data/tweets.json", dataViz);	
+
+})(window, d3);	
+
+
+
+
+</script>
+<script src="../dist/js/prism.js" type="text/javaScript"></script>
+
+</body>
+
+</html>

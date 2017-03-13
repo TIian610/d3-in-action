@@ -1,0 +1,252 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> 
+
+<html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>D3 in Action</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+		<link rel="icon"  type="image/png" href="../favicon.png" />        
+		<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+        <link href="../dist/css/normalize.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/skeleton.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/prism.css" rel="stylesheet" type="text/css">
+
+        <link rel="stylesheet" href="../dist/css/app.css" rel="stylesheet" type="text/css">
+        
+        
+
+        
+</head>
+
+
+
+	<style rel="stylesheet" type="text/css">
+		
+
+		div#ex1 {
+		    background: white;
+		    padding: 20px;
+		    width: 100%;
+		    height: 400px;
+		    overflow: auto;
+		}
+	</style>
+
+<body>
+
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+		    
+		    <h1><a href="../index.html" media="all" accesskey="0" title="D3 in action">D3 in action</a></h1>
+		    <p>Elijah Meeks</p>
+		    <p>Manning 2015 | 2017</p>
+	    </div>
+	  </div>
+	</div>
+
+
+
+<article>
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+			<h3 id="data">6.2.3 D3.stratify</h3>
+			<p><small></small></p>
+				<div id="ex1">
+				</div>
+
+
+			<p class="caption">Simple two level nest.</p>
+
+
+
+
+
+
+		    <pre><code class="language-js">
+{"orgchart":[
+
+	{"EmployeeName":"TO","Manager":"","Team":"My Company","JobRole":"Something Cool"},
+	{"EmployeeName":"JW","Manager":"TO","Team":"My Company","JobRole":"Something Cool"},
+	{"EmployeeName":"BK","Manager":"JW","Team":"Team 1","JobRole":"Something Cool"},
+	{"EmployeeName":"WH","Manager":"BK","JobRole":"Something Cool"},
+	{"EmployeeName":"SE","Manager":"BK","JobRole":"Something Cool"},
+	{"EmployeeName":"QI","Manager":"BK","JobRole":"Something Cool"},
+	{"EmployeeName":"KX","Manager":"BK","JobRole":"Something Cool"},
+	{"EmployeeName":"KA","Manager":"KX","JobRole":"Something Cool"},
+	{"EmployeeName":"HH","Manager":"JW","Team":"Team 2","JobRole":"Something Cool"},
+	{"EmployeeName":"DN","Manager":"HH","JobRole":"Something Cool"},
+	{"EmployeeName":"KT","Manager":"HH","JobRole":"Something Cool"},
+	{"EmployeeName":"JB","Manager":"KT","JobRole":"Something Cool"},
+	{"EmployeeName":"UM","Manager":"KT","JobRole":"Something Cool"},
+	{"EmployeeName":"AL","Manager":"KT","JobRole":"Something Cool"},
+	{"EmployeeName":"FR","Manager":"KT","JobRole":"Something Cool"},
+	{"EmployeeName":"WE","Manager":"HH","JobRole":"Something Cool"},
+	{"EmployeeName":"CO","Manager":"WE","JobRole":"Something Cool"},
+	{"EmployeeName":"LE","Manager":"WE","JobRole":"Something Cool"},
+	{"EmployeeName":"LO","Manager":"WE","JobRole":"Something Cool"},
+	{"EmployeeName":"YI","Manager":"HH","JobRole":"Something Cool"},
+	{"EmployeeName":"EI","Manager":"YI","JobRole":"Something Cool"},
+	{"EmployeeName":"DJ","Manager":"YI","JobRole":"Something Cool"},
+	{"EmployeeName":"SH","Manager":"YI","JobRole":"Something Cool"},
+	{"EmployeeName":"BS","Manager":"JW","Team":"Team 2","JobRole":"Something Cool"},
+	{"EmployeeName":"SP","Manager":"BS","JobRole":"Something Cool"},
+	{"EmployeeName":"SB","Manager":"JW","Team":"Team 3","JobRole":"Something Cool"},
+	{"EmployeeName":"GQ","Manager":"SB","JobRole":"Something Cool"},
+	{"EmployeeName":"JS","Manager":"GQ","JobRole":"Something Cool"},
+	{"EmployeeName":"HT","Manager":"SB","JobRole":"Something Cool"},
+	{"EmployeeName":"MB","Manager":"HT","JobRole":"Something Cool"},
+	{"EmployeeName":"MF","Manager":"HT","JobRole":"Something Cool"},
+	{"EmployeeName":"FW","Manager":"SB","JobRole":"Something Cool"},
+	{"EmployeeName":"GM","Manager":"FW","JobRole":"Something Cool"},
+	{"EmployeeName":"XT","Manager":"FW","JobRole":"Something Cool"},
+	{"EmployeeName":"VQ","Manager":"FW","JobRole":"Something Cool"}
+
+]}
+		    </code></pre>
+
+
+	    </div>
+	  </div>
+	</div>
+		
+		
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+
+			<pre><code class="language-markup"> <script type="prism-html-markup">
+<div id="viz">
+</div>
+</script>			    
+			</code></pre>
+	
+			<pre><code class="language-js">
+
+function dataViz(data){
+
+	var root = d3
+		.stratify()
+	     .id(function(d) { return d.EmployeeName; })
+	     .parentId(function(d) { return d.Manager; })
+	     (data.orgchart)
+	     .eachBefore(function(d) { d.data = {foo: d.data}; });
+
+	// assign the name to each node    
+	root.each(function(d) {
+	    d.name = d.id;
+	  });
+	// Can then pass this root to d3.tree and tree diagrams.
+
+	console.log(root);
+
+	/*
+		ws {data: Object, height: 4, depth: 0, parent: null, id: "TO"…}
+
+		ws
+			children: Array[1]
+			data: Object
+			depth: 0
+			height: 4
+			id: "TO"
+			name: "TO"
+			parent: null
+			__proto__: Object
+
+	*/
+
+}
+
+
+d3.json("../data/org.json", dataViz);	
+
+
+
+
+
+
+			</code></pre>
+
+	    </div>
+	  </div>
+	</div>
+	
+	
+</article>
+
+
+<script src="../dist/js/vendors/d3.min.js" type="text/javaScript"></script>
+
+
+<!-- http://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3 -->
+<script src="../dist/js/colorbrewer.js" 	type="text/javascript"></script>
+<script src="../dist/js/cloud.js" 	type="text/javascript"></script>
+
+<script>
+	
+
+(function(scope, d3) {
+
+	function dataViz(data){
+		console.log('Hello from dataViz');
+
+	var root = d3
+		.stratify()
+        .id(function(d) { return d.EmployeeName; })
+        .parentId(function(d) { return d.Manager; })
+        (data.orgchart)
+        .eachBefore(function(d) { d.data = {foo: d.data}; });
+
+    // assign the name to each node    
+	root.each(function(d) {
+	    d.name = d.id;
+	  });
+	// Can then pass this root to d3.tree and tree diagrams.
+
+  		console.log(root);
+
+  		/*
+			ws {data: Object, height: 4, depth: 0, parent: null, id: "TO"…}
+
+			ws
+				children: Array[1]
+				data: Object
+				depth: 0
+				height: 4
+				id: "TO"
+				name: "TO"
+				parent: null
+				__proto__: Object
+
+  		*/
+
+
+	}
+
+
+	d3.json("../data/org.json", dataViz);	
+
+})(window, d3);	
+
+
+
+
+</script>
+<script src="../dist/js/prism.js" type="text/javaScript"></script>
+
+</body>
+
+</html>
