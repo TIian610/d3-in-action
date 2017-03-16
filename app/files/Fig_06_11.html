@@ -1,0 +1,333 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> 
+
+<html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>D3 in Action</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+		<link rel="icon"  type="image/png" href="../favicon.png" />        
+		<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+        <link href="../dist/css/normalize.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/skeleton.css" rel="stylesheet" type="text/css">
+        <link href="../dist/css/prism.css" rel="stylesheet" type="text/css">
+
+        <link rel="stylesheet" href="../dist/css/app.css" rel="stylesheet" type="text/css">
+        
+        
+
+        
+</head>
+
+
+
+	<style rel="stylesheet" type="text/css">
+		text {
+    		font-size: 12px;
+		}
+
+	</style>
+
+<body>
+
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+		    
+		    <h1><a href="../index.html" media="all" accesskey="0" title="D3 in action">D3 in action</a></h1>
+		    <p>Elijah Meeks</p>
+		    <p>Manning 2015 | 2017</p>
+	    </div>
+	  </div>
+	</div>
+
+
+
+<article>
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+			<h3 id="data">6.4.1 Drawing a dendrogram</h3>
+			<p><small></small></p>
+
+				<div id="viz">
+				</div>
+
+
+
+
+
+			<p class="caption">Figure 6.10 A dendrogram laid out vertically using data from tweets.json. The level 0 “root” node (which we created to contain the users) is in blue, the level 1 nodes (which represent users) are in orange, and the level 2 “leaf” nodes (which represent tweets) are in green.</p>
+
+
+			<p class="caption">Figure 6.11 Adendrogram with labels for each of the nodes.</p>
+
+			<p class="caption">Figure 6.12 The same dendrogram as figure 6.15 but laid out horizontally.</p>
+
+			<p class="caption">Figure 6.13 The same dendrogram laid out in a radial manner.</p>
+
+
+		    <pre><code class="language-js">
+{
+	"tweets": [
+	{"user": "Al", "content": "I really love seafood.", "timestamp": " Mon Dec 23 2013 21:30 GMT-0800 (PST)", "retweets": ["Raj","Pris","Roy"], "favorites": ["Sam"]},
+	{"user": "Al", "content": "I take that back, this doesn't taste so good.", "timestamp": "Mon Dec 23 2013 21:55 GMT-0800 (PST)", "retweets": ["Roy"], "favorites": []},
+	{"user": "Al", "content": "From now on, I'm only eating cheese sandwiches.", "timestamp": "Mon Dec 23 2013 22:22 GMT-0800 (PST)", "retweets": [], "favorites": ["Roy","Sam"]},
+	{"user": "Roy", "content": "Great workout!", "timestamp": " Mon Dec 23 2013 7:20 GMT-0800 (PST)", "retweets": [], "favorites": []},
+	{"user": "Roy", "content": "Spectacular oatmeal!", "timestamp": " Mon Dec 23 2013 7:23 GMT-0800 (PST)", "retweets": [], "favorites": []},
+	{"user": "Roy", "content": "Amazing traffic!", "timestamp": " Mon Dec 23 2013 7:47  GMT-0800 (PST)", "retweets": [], "favorites": []},
+	{"user": "Roy", "content": "Just got a ticket for texting and driving!", "timestamp": " Mon Dec 23 2013 8:05 GMT-0800 (PST)", "retweets": [], "favorites": ["Sam", "Sally", "Pris"]},
+	{"user": "Pris", "content": "Going to have some boiled eggs.", "timestamp": " Mon Dec 23 2013 18:23 GMT-0800 (PST)", "retweets": [], "favorites": ["Sally"]},
+	{"user": "Pris", "content": "Maybe practice some gymnastics.", "timestamp": " Mon Dec 23 2013 19:47  GMT-0800 (PST)", "retweets": [], "favorites": ["Sally"]},
+	{"user": "Sam", "content": "@Roy Let's get lunch", "timestamp": " Mon Dec 23 2013 11:05 GMT-0800 (PST)", "retweets": ["Pris"], "favorites": ["Sally", "Pris"]}
+	]
+}
+		    </code></pre>
+
+
+	    </div>
+	  </div>
+	</div>
+		
+		
+	<div class="container">
+	
+	  <div class="row">
+	    <div class="twelve columns">
+
+			<pre><code class="language-markup"> <script type="prism-html-markup">
+<div id="viz">
+</div>
+</script>			    
+			</code></pre>
+	
+			<pre><code class="language-js">
+
+var h = 600,
+	w = 600;
+var margin = {top: 20, right: 20, bottom: 20, left: 20};
+var width =  w - margin.left - margin.right,
+ 	height = h - margin.top -  margin.bottom;
+
+ var depthScale = d3.scaleOrdinal()
+	.range(["#5EAFC6", "#FE9922", "#93c464", "#75739F"]);
+
+
+// Listing 6.4 Callback function to draw a dendrogram	
+function dataViz(data){
+	console.log('Hello from dataViz');
+
+	var nestedTweets = d3
+		.nest()
+		.key(d => d.user)
+		.entries(data.tweets);
+	// nestedTweets --> [Object, Object, Object, Object]
+		
+	var packableTweets = { id: "All Tweets", values: nestedTweets };
+	   
+	var treeChart = d3.tree();	
+	treeChart.size([width,height]);
+
+	var root = d3
+		.hierarchy(packableTweets, d => d.values)
+		.sum(() => 1);
+
+	var treeData = treeChart(root).descendants();
+	console.log(treeData);
+	// treeData --> [ ws, ws, ws, ws, ws, ws, ws, ws, ws, ws, ws, ws, ws, ws, ws ]
+
+
+
+
+	var mySVG = d3.select("#viz")
+		.append("svg")
+		.attr("width", w)
+		.attr("height", h)
+		.attr("preserveAspectRatio", "xMinYMin meet")
+		.attr("viewBox", "0 0 "+ w + " " + h);
+
+
+	var g = mySVG
+		.append('svg:g')
+		.attr("id", "treeG")
+		.attr("transform", "translate(0,10)")
+		// Draw a <g> element for each node so we can put a circle in it now and add a label later
+		.selectAll("g")
+		.data(treeData)
+		.enter()
+		.append("g")
+		.attr("class", "node")
+		.attr("transform", d => "translate(" +d.x+","+d.y+")");
+
+	d3.selectAll("g.node")
+     	.append("circle")
+		.attr("r", 10)
+		// Fill based on the depth calculated by d3.hierarchy
+		.style("fill", d => depthScale(d.depth))
+		.style("stroke", "white")
+		// Add a white halo around each node to give the connecting lines an offset appearance
+		.style("stroke-width", "2px"); 
+
+
+	d3.select("#treeG")
+		.selectAll("line")
+		// Draw links using the same data except filter out any nodes that don’t have parents (which won’t have links)
+		.data(treeData.filter(d => d.parent))
+		.enter()
+		.insert("line","g")
+		// Draw the link starting at the parent node location
+		.attr("x1", d => d.parent.x)
+		.attr("y1", d => d.parent.y)
+		// Draw the link ending at the child node location
+		.attr("x2", d => d.x)
+		.attr("y2", d => d.y)
+		.style("stroke", "black");
+
+	d3.selectAll("g.node")
+		.append("text")
+		.style("text-anchor", "middle")
+		.style("fill", "#4f442b")
+		.text(d => d.data.id || d.data.key || d.data.content);
+
+}
+
+
+d3.json("../data/tweets.json", dataViz);	
+
+
+
+			</code></pre>
+
+	    </div>
+	  </div>
+	</div>
+	
+	
+</article>
+
+
+<script src="../dist/js/vendors/d3.min.js" type="text/javaScript"></script>
+
+
+<!-- http://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3 -->
+<script src="../dist/js/colorbrewer.js" 	type="text/javascript"></script>
+<script src="../dist/js/cloud.js" 	type="text/javascript"></script>
+
+<script>
+	
+
+(function(scope, d3) {
+
+
+	var h = 600,
+		w = 600;
+	var margin = {top: 20, right: 20, bottom: 20, left: 20};
+	var width =  w - margin.left - margin.right,
+    	height = h - margin.top -  margin.bottom;
+
+    var depthScale = d3.scaleOrdinal()
+		.range(["#5EAFC6", "#FE9922", "#93c464", "#75739F"]);
+
+	
+	// Listing 6.4 Callback function to draw a dendrogram	
+	function dataViz(data){
+		console.log('Hello from dataViz');
+
+		var nestedTweets = d3
+			.nest()
+			.key(d => d.user)
+			.entries(data.tweets);
+		// nestedTweets --> [Object, Object, Object, Object]
+			
+		var packableTweets = { id: "All Tweets", values: nestedTweets };
+		   
+		var treeChart = d3.tree();	
+		treeChart.size([width,height]);
+
+		var root = d3
+			.hierarchy(packableTweets, d => d.values)
+			.sum(() => 1);
+
+		var treeData = treeChart(root).descendants();
+		console.log(treeData);
+		// treeData --> [ ws, ws, ws, ws, ws, ws, ws, ws, ws, ws, ws, ws, ws, ws, ws ]
+
+
+
+
+		var mySVG = d3.select("#viz")
+			.append("svg")
+			.attr("width", w)
+			.attr("height", h)
+			.attr("preserveAspectRatio", "xMinYMin meet")
+			.attr("viewBox", "0 0 "+ w + " " + h);
+
+
+		var g = mySVG
+			.append('svg:g')
+			.attr("id", "treeG")
+			.attr("transform", "translate(0,10)")
+			// Draw a <g> element for each node so we can put a circle in it now and add a label later
+			.selectAll("g")
+			.data(treeData)
+			.enter()
+			.append("g")
+			.attr("class", "node")
+			.attr("transform", d => "translate(" +d.x+","+d.y+")");
+
+		d3.selectAll("g.node")
+        	.append("circle")
+			.attr("r", 10)
+			// Fill based on the depth calculated by d3.hierarchy
+			.style("fill", d => depthScale(d.depth))
+			.style("stroke", "white")
+			// Add a white halo around each node to give the connecting lines an offset appearance
+			.style("stroke-width", "2px"); 
+
+
+		d3.select("#treeG")
+			.selectAll("line")
+			// Draw links using the same data except filter out any nodes that don’t have parents (which won’t have links)
+			.data(treeData.filter(d => d.parent))
+			.enter()
+			.insert("line","g")
+			// Draw the link starting at the parent node location
+			.attr("x1", d => d.parent.x)
+			.attr("y1", d => d.parent.y)
+			// Draw the link ending at the child node location
+			.attr("x2", d => d.x)
+			.attr("y2", d => d.y)
+			.style("stroke", "black");
+
+		d3.selectAll("g.node")
+			.append("text")
+			.style("text-anchor", "middle")
+			.style("fill", "#4f442b")
+			.text(d => d.data.id || d.data.key || d.data.content);
+
+	}
+
+
+	d3.json("../data/tweets.json", dataViz);	
+
+})(window, d3);	
+
+
+
+
+</script>
+<script src="../dist/js/prism.js" type="text/javaScript"></script>
+
+</body>
+
+</html>
